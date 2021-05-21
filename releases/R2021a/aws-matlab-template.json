@@ -173,11 +173,16 @@
                   "Ref": "LicenseManager"
                 },
                 "}\n",
-                "net user Administrator ",
+                "Set-Content -Path \"C:\\Windows\\Temp\\pass.txt\" -Value ",
                 {
-                  "Ref": "Password"
+                  "Fn::Base64": {
+                    "Ref": "Password"
+                  }
                 },
                 "\n",
+                "$dpass=[Text.Encoding]::Utf8.GetString([Convert]::FromBase64String((Get-Content \"C:\\Windows\\Temp\\pass.txt\")))\n",
+                "net user Administrator $dpass\n",
+                "Remove-Item \"C:\\Windows\\Temp\\pass.txt\"\n",
                 "& C:/Windows/Temp/warmup-matlab.ps1\n",
                 "& \"C:\\Program Files\\Amazon\\cfn-bootstrap\\cfn-signal\" ",
                 " --stack ",
