@@ -18,7 +18,7 @@ The following guide will help you automate the process of running the MATLAB des
 ## Prepare your AWS Account
 
 1. If you don't have an AWS account, create one at https://aws.amazon.com by following the on-screen instructions.
-2. Use the regions selector in the navigation bar to choose the **US East (N. Virginia)** or **EU (Ireland)** region where you want to deploy MATLAB.
+2. Use the regions selector in the navigation bar to choose a region supported for the release of MATLAB that you want to deploy.
 3. Create a [key pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) in that region.  The key pair is necessary as it is the only way to connect to the instance as an administrator.
 4. If necessary, [request a service limit increase](https://console.aws.amazon.com/support/home#/case/create?issueType=service-limit-increase&limitType=service-code-) for the Amazon EC2 instance type or VPCs.  You might need to do this if you already have existing deployments that use that instance type or you think you might exceed the [default limit](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html) with this deployment.
 
