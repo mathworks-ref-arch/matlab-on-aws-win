@@ -163,6 +163,8 @@
               "",
               [
                 "<powershell>\n",
+                "Stop-Service -Name Spooler -Force\n",
+                "Set-Service -Name Spooler -StartupType Disabled\n",
                 "if (-not ([string]::IsNullOrEmpty(\"",
                 {
                   "Ref": "LicenseManager"
