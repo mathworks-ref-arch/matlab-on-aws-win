@@ -3,9 +3,10 @@
 ## Requirements
 Before starting, you will need the following:
 -   A MATLAB® license that is current on Software
-    Maintenance Service (SMS). For more information, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/licensingoncloud/matlab-on-the-cloud.html).
+    Maintenance Service (SMS). For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://mathworks.com/help
+/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
 -   An Amazon Web Services™ (AWS) account.
--   An SSH Key Pair for your AWS account in the appropriate region. For more information, see [Amazon EC2 Key Pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).
+-   Key Pair for your AWS account in the appropriate region. For more information, see [Amazon EC2 Key Pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).
 
 ## Costs
 You are responsible for the cost of the AWS services used when you create cloud resources using this guide. Resource settings, such as instance type, will affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you will be using. Prices are subject to change.
@@ -30,6 +31,7 @@ Select a release to continue:
 
 | Release |
 | ------- |
+| [R2021b](releases/R2021b/README.md) |
 | [R2021a](releases/R2021a/README.md) |
 | [R2020b](releases/R2020b/README.md) |
 
@@ -38,7 +40,7 @@ Select a release to continue:
 
 ![MATLAB on AWS Reference Architecture](img/aws-matlab-diagram.png)
 
-Deploying this reference architecture sets up a single AWS EC2 instance containing Windows and MATLAB, a private VPC with an internet gateway, a private subnet and a security group that opens the appropriate ports for SSH and RDP access.
+Deploying this reference architecture sets up a single AWS EC2 instance containing Windows and MATLAB, a private VPC with an internet gateway, a private subnet and a security group that opens the appropriate ports for RDP access.
 
 To make deployment easy, we have prepared an Amazon Machine Image (AMI) running Windows 2019 Server with pre-installed drivers. The AMI contains the following software:
 * MATLAB, Simulink, Toolboxes, and support for GPUs.
@@ -50,7 +52,7 @@ The following resources will be created as part of the CloudFormation Stack:
 
 1. VPC w/Internet Gateway
 1. Subnet
-1. Security Group for SSH and RDP access
+1. Security Group for RDP access
 1. EC2 Instance
 
 ## FAQ
