@@ -50,8 +50,6 @@ To make deployment easy, we have prepared an Amazon Machine Image (AMI) running 
 
 The following resources will be created as part of the CloudFormation Stack:
 
-1. VPC w/Internet Gateway
-1. Subnet
 1. Security Group for RDP access
 1. EC2 Instance
 
