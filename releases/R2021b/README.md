@@ -41,7 +41,7 @@ After you click the Launch Stack button above, the “Create stack” page will 
 | **AWS EC2 Instance type** | The AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types. |
 | **Instance Name** | Give your MATLAB virtual machine a name |
 | **Storage Size (GiB)** | Specify the size in GB of the root volume |
-| **IAM Role (Optional)** | Specify an IAM Role to associate with this instance. |
+| **IAM Role (Optional)** | Specify an IAM Role to associate with this instance. If not specified, PredefinedRole IAM role is used which is required for NiceDCV remote connectivity feature. If specified, only RDP access is available. |
 | **VPC to deploy this stack to** | ID of an existing VPC in which to deploy this stack |
 | **Subnet** | List of existing subnets IDs |
 | **RDP Key Pair** | The name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
@@ -49,7 +49,10 @@ After you click the Launch Stack button above, the “Create stack” page will 
 | **Remote password** | Enter a password for the user Administrator |
 | **Confirm remote password** | Confirm Password |
 | **License Manager for MATLAB connection string** | Optional License Manager for MATLAB string in the form \<port>@\<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host. |
+| **Configure cloudwatch logging for the MATLAB instance** | Choose whether you want to enable cloudwatch logging for the MATLAB instance |
 | **Additional security group to place instances in** | The ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
+| **Use Elastic IP address that persists across machine reboots** | Allocate an Elastic IP address for your EC2 instance. This allows your machine to preserve its IP address across reboots. Note the elastic IPs are limited, check with your account administrator. |
+| **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours |
 
 
 >**Note**: If you chose to associate an IAM role above you'll need to acknowledge that it may create IAM resources in the Capabilities before creating the stack.
@@ -71,6 +74,9 @@ Double-click the MATLAB icon on the virtual machine desktop to launch MATLAB. Th
 
 # Additional Information
 
+## CloudWatch Logs
+CloudWatch logs enables you to access logs from all the resources in your stack in a single place. To use CloudWatch logs, launch the stack with the feature "Configure cloudwatch logging for the MATLAB instance" enabled. Once the stack deployment is complete, you can access your logs in the "Outputs" of the stack by clicking the link next to "CloudWatchLogs". Note that if you delete the stack, the CloudWatch log group is also deleted. For more information, see [What is Amazon CloudWatch Logs?](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html).
+
 ## Delete Your Cloud Resources
 
 Once you have finished using your stack, it is recommended that you delete all resources to avoid incurring further cost. To delete the stack, do the following:
@@ -78,9 +84,9 @@ Once you have finished using your stack, it is recommended that you delete all r
 1. Go to the AWS CloudFormation page and select the stack you created.
 1. Click the **Actions** button and click **Delete Stack** from the menu that appears.
 
-### Resources
+## Resources
 
 The following resources will be created as part of the CloudFormation Stack.
 
-1. Security Group for RDP access
+1. Security Group for SSH and RDP access
 1. EC2 Instance
