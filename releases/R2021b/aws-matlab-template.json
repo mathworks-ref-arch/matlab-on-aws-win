@@ -703,7 +703,7 @@
       "Description": "Optional License Manager for MATLAB string in the form <port>@<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host.",
       "Type": "String",
       "Default": "",
-      "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-]+)?",
+      "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-_]+)?",
       "ConstraintDescription": "If specified, must be in the form <port>@<hostname>"
     },
     "EnableCloudWatch": {
