@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-08a2da41cbe3aac76"
+        "AMI": "ami-0f8f73fc87f912a3b"
       },
       "us-east-2": {
-        "AMI": "ami-0dd204a815890a121"
+        "AMI": "ami-08dc923362587a845"
       },
       "us-west-1": {
-        "AMI": "ami-0f60aba33371ffe27"
+        "AMI": "ami-071be85cc61ef87ee"
       },
       "us-west-2": {
-        "AMI": "ami-04579b47b463781cf"
+        "AMI": "ami-03e05c57322f91a02"
       },
       "ca-central-1": {
-        "AMI": "ami-06a226c4743553970"
+        "AMI": "ami-08e92ce7cb388af6d"
       },
       "eu-central-1": {
-        "AMI": "ami-00830dbd394a3e734"
+        "AMI": "ami-0f79008d49865184f"
       },
       "eu-west-1": {
-        "AMI": "ami-0dc044cdf089a1034"
+        "AMI": "ami-0725aeaa8ebfa8ca7"
       },
       "eu-west-2": {
-        "AMI": "ami-05e30885a36812783"
+        "AMI": "ami-000e1996f446080c3"
       },
       "eu-west-3": {
-        "AMI": "ami-0f6be770602270628"
+        "AMI": "ami-0e6fe8650c945d997"
       },
       "eu-north-1": {
-        "AMI": "ami-0a758e4cba4519848"
+        "AMI": "ami-018805b317c4b9363"
       },
       "sa-east-1": {
-        "AMI": "ami-02328f9efa857b511"
+        "AMI": "ami-0515a4e3e4fbc34be"
       },
       "me-south-1": {
-        "AMI": "ami-0a095dcb536c09921"
+        "AMI": "ami-00b57db430659aba0"
       },
       "ap-east-1": {
-        "AMI": "ami-0ece0e835bff3b338"
+        "AMI": "ami-0a9402a4f7db3cdb4"
       },
       "ap-south-1": {
-        "AMI": "ami-04e3b007c50c8c25c"
+        "AMI": "ami-0fe951ac3e490acab"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0792a990b7d2cf802"
+        "AMI": "ami-0319a22c0abec0066"
       },
       "ap-northeast-2": {
-        "AMI": "ami-0c51b99329d07435b"
+        "AMI": "ami-0908f7adffe1b119e"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0ce81815afcbc674d"
+        "AMI": "ami-0b3b9335c58421ed9"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0ec8a841b3bf48e2d"
+        "AMI": "ami-0f25810fc7f4d54dd"
       }
     }
   },
@@ -261,6 +261,15 @@
             "CidrIp": {
               "Ref": "ClientIPAddress"
             }
+          },
+          {
+            "IpProtocol": "tcp",
+            "Description": "SSH",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": {
+              "Ref": "ClientIPAddress"
+            }
           }
         ]
       }
@@ -346,8 +355,8 @@
               "",
               [
                 "<powershell>\n",
-                "Stop-Service -Name Spooler -Force\n",
-                "Set-Service -Name Spooler -StartupType Disabled\n",
+                "\"UserData from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
+                "\"LicenseManager configuration started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "if (-not ([string]::IsNullOrEmpty(\"",
                 {
                   "Ref": "LicenseManager"
@@ -358,6 +367,7 @@
                   "Ref": "LicenseManager"
                 },
                 "}\n",
+                "\"LicenseManager configuration ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "Set-Content -Path \"C:\\Windows\\Temp\\pass.txt\" -Value ",
                 {
                   "Fn::Base64": {
@@ -368,7 +378,9 @@
                 "$dpass=[Text.Encoding]::Utf8.GetString([Convert]::FromBase64String((Get-Content \"C:\\Windows\\Temp\\pass.txt\")))\n",
                 "net user Administrator $dpass\n",
                 "Remove-Item \"C:\\Windows\\Temp\\pass.txt\"\n",
+                "\"Warmup from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "& C:/Windows/Temp/warmup-matlab.ps1\n",
+                "\"Warmup from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "& \"C:\\Program Files\\Amazon\\cfn-bootstrap\\cfn-signal\" ",
                 " --stack ",
                 {
@@ -380,6 +392,7 @@
                   "Ref": "AWS::Region"
                 },
                 "\n",
+                "\"Logging configuration from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "& \"C:/Program Files/Amazon/AmazonCloudWatchAgent/Start-Logging.ps1\" -ENABLE_CLOUDWATCH_LOGGING ",
                 {
                   "Ref": "EnableCloudWatch"
@@ -409,6 +422,8 @@
                   ]
                 },
                 "\n",
+                "\"Logging configuration from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
+                "\"UserData from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "</powershell>\n",
                 "<persist>true</persist>"
               ]
@@ -887,7 +902,7 @@
     }
   },
   "Outputs": {
-    "RDPConnection": {
+    "RDPSSHConnection": {
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
@@ -1018,7 +1033,7 @@
       ],
       "ParameterLabels": {
         "ClientIPAddress": {
-          "default": "Allow RDP connections from"
+          "default": "Allow RDP and SSH connections from"
         },
         "InstanceType": {
           "default": "AWS EC2 Instance type"

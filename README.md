@@ -13,7 +13,7 @@ You are responsible for the cost of the AWS services used when you create cloud 
 
 ## Introduction
 
-The following guide will help you automate the process of running the MATLAB desktop on Amazon Web Services using a Windows virtual machine and connect to it using the Remote Desktop Protocol (RDP). The automation is accomplished using an AWS CloudFormation template. The template is a JSON file that defines the resources needed to run MATLAB on AWS. For information about the architecture of this solution, see [Architecture and Resources](#architecture-and-resources). For information about templates, see [AWS CloudFormation Templates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html).
+The following guide will help you automate the process of running the MATLAB desktop on Amazon Web Services using a Windows virtual machine and connect to it using the Remote Desktop Protocol (RDP) or SSH. The automation is accomplished using an AWS CloudFormation template. The template is a JSON file that defines the resources needed to run MATLAB on AWS. For information about the architecture of this solution, see [Architecture and Resources](#architecture-and-resources). For information about templates, see [AWS CloudFormation Templates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html).
 
 
 ## Prepare your AWS Account
@@ -40,7 +40,7 @@ Select a release to continue:
 
 ![MATLAB on AWS Reference Architecture](img/aws-matlab-diagram.png)
 
-Deploying this reference architecture sets up a single AWS EC2 instance containing Windows and MATLAB, a private VPC with an internet gateway, a private subnet and a security group that opens the appropriate ports for RDP access.
+Deploying this reference architecture sets up a single AWS EC2 instance containing Windows and MATLAB, a private VPC with an internet gateway, a private subnet and a security group that opens the appropriate ports for RDP and SSH access.
 
 To make deployment easy, we have prepared an Amazon Machine Image (AMI) running Windows 2019 Server with pre-installed drivers. The AMI contains the following software:
 * MATLAB, Simulink, Toolboxes, and support for GPUs.
@@ -50,7 +50,7 @@ To make deployment easy, we have prepared an Amazon Machine Image (AMI) running 
 
 The following resources will be created as part of the CloudFormation Stack:
 
-1. Security Group for RDP access
+1. Security Group for RDP and SSH access
 1. EC2 Instance
 
 ## FAQ
