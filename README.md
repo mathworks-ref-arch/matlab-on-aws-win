@@ -3,8 +3,7 @@
 ## Requirements
 Before starting, you will need the following:
 -   A MATLAB® license that is current on Software
-    Maintenance Service (SMS). For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://mathworks.com/help
-/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
+    Maintenance Service (SMS). For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
 -   An Amazon Web Services™ (AWS) account.
 -   Key Pair for your AWS account in the appropriate region. For more information, see [Amazon EC2 Key Pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).
 
@@ -25,12 +24,11 @@ The following guide will help you automate the process of running the MATLAB des
 
 # Deployment Steps
 
-The MATLAB Reference Architecture is released in lockstep with the bi-annual MATLAB releases.
-Each reference architecture release has its own instructions as we continue to evolve it.
-Select a release to continue:
+MATLAB Reference Architecture is released with the twice-yearly general release schedule of MATLAB. To view instructions for deploying the MATLAB reference architecture, select a MATLAB release:
 
 | Release |
 | ------- |
+| [R2022a](releases/R2022a/README.md) |
 | [R2021b](releases/R2021b/README.md) |
 | [R2021a](releases/R2021a/README.md) |
 | [R2020b](releases/R2020b/README.md) |
