@@ -78,6 +78,9 @@ Double-click the MATLAB icon on the virtual machine desktop to launch MATLAB. Th
 ## CloudWatch Logs
 CloudWatch logs enables you to access logs from all the resources in your stack in a single place. To use CloudWatch logs, launch the stack with the feature "Configure cloudwatch logging for the MATLAB instance" enabled. Once the stack deployment is complete, you can access your logs in the "Outputs" of the stack by clicking the link next to "CloudWatchLogs". Note that if you delete the stack, the CloudWatch log group is also deleted. For more information, see [What is Amazon CloudWatch Logs?](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html).
 
+## Installing NVIDIA GRID Drivers
+If you are running a GPU instance that belongs to `G3`, `G4dn` or `G5` instance type, you can use GPUs for compute with the default drivers, but you might need NVIDIA GRID drivers if you want to run 3D simulations (for example, with Automated Driving Toolbox). You can install NVIDIA GRID Drivers by running the `Install-NVIDIAGridDriver.ps1` script in the `C:\Windows\NVIDIADrivers\` directory. To complete the installation of GRID drivers, restart the machine when prompted by the script. For more details, please visit the official AWS documentation page: [Install NVIDIA drivers on Windows instances](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/install-nvidia-driver.html).
+
 ## Delete Your Cloud Resources
 
 Once you have finished using your stack, it is recommended that you delete all resources to avoid incurring further cost. To delete the stack, do the following:

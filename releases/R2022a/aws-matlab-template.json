@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-073c71b30218913eb"
+        "AMI": "ami-0c4a15b1ec6116586"
       },
       "us-east-2": {
-        "AMI": "ami-0e2610400ea1c1e13"
+        "AMI": "ami-070c1e3b8d9dd8c2a"
       },
       "us-west-1": {
-        "AMI": "ami-0c88e5b174355da0d"
+        "AMI": "ami-0a610c809659c5123"
       },
       "us-west-2": {
-        "AMI": "ami-0680edf248b42039b"
+        "AMI": "ami-003df258bb442dc05"
       },
       "ca-central-1": {
-        "AMI": "ami-0877ae0efad5ae059"
+        "AMI": "ami-0e0dcc819c736be08"
       },
       "eu-central-1": {
-        "AMI": "ami-090ec488a74f9b815"
+        "AMI": "ami-0a8b45924c0f8a790"
       },
       "eu-west-1": {
-        "AMI": "ami-05b67703ce4830638"
+        "AMI": "ami-09f8be3d8584ed7ce"
       },
       "eu-west-2": {
-        "AMI": "ami-0db06295ab5298d1c"
+        "AMI": "ami-015d82916bfc44e13"
       },
       "eu-west-3": {
-        "AMI": "ami-05ab76c0b6a1afb98"
+        "AMI": "ami-04b41088ea6ebf78b"
       },
       "eu-north-1": {
-        "AMI": "ami-07765fd474c45fc25"
+        "AMI": "ami-04b1ab904b8804b73"
       },
       "sa-east-1": {
-        "AMI": "ami-02e0aa54205a13389"
+        "AMI": "ami-0317f5d8855e7737e"
       },
       "me-south-1": {
-        "AMI": "ami-075203314fffecb23"
+        "AMI": "ami-0284dbe2102de31aa"
       },
       "ap-east-1": {
-        "AMI": "ami-0813a270253420479"
+        "AMI": "ami-08b9bb7c22d893f85"
       },
       "ap-south-1": {
-        "AMI": "ami-07d2d30280784de38"
+        "AMI": "ami-044cba3a64d4e6052"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0409f78c91f757718"
+        "AMI": "ami-04c47cdb6df1dd8aa"
       },
       "ap-northeast-2": {
-        "AMI": "ami-00f7f55c7677bc2f3"
+        "AMI": "ami-0c75c7ffee8234839"
       },
       "ap-southeast-1": {
-        "AMI": "ami-040984f3b8d06dc3d"
+        "AMI": "ami-0b65d6a4f0cec1e05"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0b96da98890b25118"
+        "AMI": "ami-0220bab8915a03032"
       }
     }
   },
@@ -369,6 +369,37 @@
               [
                 "<powershell>\n",
                 "\"UserData from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
+                "\"Logging configuration from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
+                "& \"C:/Program Files/Amazon/AmazonCloudWatchAgent/Start-Logging.ps1\" -ENABLE_CLOUDWATCH_LOGGING ",
+                {
+                  "Ref": "EnableCloudWatch"
+                },
+                " -METRICS_COLLECTION_INTERVAL_IN_SECS 60 -LOG_GROUP_NAME ",
+                {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      {
+                        "Fn::Select": [
+                          "2",
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                "\n",
+                "\"Logging configuration from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "\"LicenseManager configuration started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "if (-not ([string]::IsNullOrEmpty(\"",
                 {
@@ -405,37 +436,7 @@
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                "\"Logging configuration from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "& \"C:/Program Files/Amazon/AmazonCloudWatchAgent/Start-Logging.ps1\" -ENABLE_CLOUDWATCH_LOGGING ",
-                {
-                  "Ref": "EnableCloudWatch"
-                },
-                " -METRICS_COLLECTION_INTERVAL_IN_SECS 60 -LOG_GROUP_NAME ",
-                {
-                  "Fn::Join": [
-                    "-",
-                    [
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      {
-                        "Fn::Select": [
-                          "2",
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Ref": "AWS::StackId"
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                },
-                "\n",
-                "\"Logging configuration from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
+                "Set-Content -Path \"C:\\Windows\\NVIDIADrivers\\instances-supporting-grid-drivers.txt\" -Value \"g3,g4dn,g5\"\n",
                 "\"UserData from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "</powershell>\n",
                 "<persist>true</persist>"
