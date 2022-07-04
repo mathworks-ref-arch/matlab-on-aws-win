@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-06799efd446976f74"
+        "AMI": "ami-0cabbc2952f596092"
       },
       "us-east-2": {
-        "AMI": "ami-01b9dc8462b319b0a"
+        "AMI": "ami-0ad0d8ddaab1c8b73"
       },
       "us-west-1": {
-        "AMI": "ami-09486608421372a56"
+        "AMI": "ami-0bbd174993b312938"
       },
       "us-west-2": {
-        "AMI": "ami-0717e49476b204ab1"
+        "AMI": "ami-094fc895c39d18512"
       },
       "ca-central-1": {
-        "AMI": "ami-0cee035ba6bcaa792"
+        "AMI": "ami-0317a8c24e67bcfd6"
       },
       "eu-central-1": {
-        "AMI": "ami-06560597227eca0c2"
+        "AMI": "ami-0a1e446df71b7b7b4"
       },
       "eu-west-1": {
-        "AMI": "ami-00670ab59f202f5a1"
+        "AMI": "ami-04507b2f7a567b865"
       },
       "eu-west-2": {
-        "AMI": "ami-02634b1f491d3141e"
+        "AMI": "ami-0ea6ef2320cc96212"
       },
       "eu-west-3": {
-        "AMI": "ami-0456e7a995023496b"
+        "AMI": "ami-096a53fbb660b3ac1"
       },
       "eu-north-1": {
-        "AMI": "ami-04a7689180e520a41"
+        "AMI": "ami-05584d67d49b26136"
       },
       "sa-east-1": {
-        "AMI": "ami-0b9978854f1f619c1"
+        "AMI": "ami-038cbb48a7c1b3b39"
       },
       "me-south-1": {
-        "AMI": "ami-0d1ed7e3e94b0e83a"
+        "AMI": "ami-088b47b288a21fbe7"
       },
       "ap-east-1": {
-        "AMI": "ami-0be21a4a18c3af755"
+        "AMI": "ami-0e15feacd8b91bfd5"
       },
       "ap-south-1": {
-        "AMI": "ami-0a51b0f68374e77a9"
+        "AMI": "ami-01363dd2508a5c446"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0112e233cb73a7afc"
+        "AMI": "ami-06ec6603b3fef880d"
       },
       "ap-northeast-2": {
-        "AMI": "ami-042fe1f1fe9d3ad2e"
+        "AMI": "ami-0964fdca9bb8ca57b"
       },
       "ap-southeast-1": {
-        "AMI": "ami-090bb19d670cab156"
+        "AMI": "ami-05c5eb278d5ca7d71"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0af82fe5dec50ede3"
+        "AMI": "ami-0ed70f75b3d4688db"
       }
     }
   },
@@ -422,6 +422,7 @@
                   ]
                 },
                 "\n",
+                "Set-Content -Path \"C:\\Windows\\NVIDIADrivers\\instances-supporting-grid-drivers.txt\" -Value \"g3,g4dn,g5\"\n",
                 "\"Logging configuration from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "\"UserData from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
                 "</powershell>\n",

@@ -25,7 +25,9 @@ The following guide will help you automate the process of running the MATLAB des
 
 # Deployment Steps
 
-MATLAB Reference Architecture is released with the twice-yearly general release schedule of MATLAB. To view instructions for deploying the MATLAB reference architecture, select a MATLAB release:
+The MATLAB Reference Architecture is released in lockstep with the bi-annual MATLAB releases.
+Each reference architecture release has its own instructions as we continue to evolve it.
+Select a release to continue:
 
 | Release |
 | ------- |
