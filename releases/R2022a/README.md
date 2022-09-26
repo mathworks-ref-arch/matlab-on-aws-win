@@ -61,7 +61,7 @@ After you click the Launch Stack button above, the “Create stack” page will 
 
 ## Step 3. Connect to the Virtual Machine in the Cloud
 
-1. Expand the **Outputs** section in the the *Stack Detail* page.
+1. Expand the **Outputs** section in the *Stack Detail* page.
 1. Look for the key named `RDPSSHConnection` and copy the corresponding public DNS name listed under value. *For example*: ec2-11-222-33-44.compute-1.amazonaws.com
 1. Launch any remote desktop client, paste the public DNS name in the appropriate field, and connect. On the Windows Remote Desktop Client you need to paste the public DNS name in the **Computer** field and click **Connect**.
 1. In the login screen that's displayed, use the username `Administrator` and the password you specified while setting up the stack in [Step 2](#step-2-configure-the-stack).
