@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-0fc74d5fbeba98f70"
+        "AMI": "ami-059e96e9c619f116c"
       },
       "us-east-2": {
-        "AMI": "ami-01c69d58286e81764"
+        "AMI": "ami-0d4535d692c8a3d5d"
       },
       "us-west-1": {
-        "AMI": "ami-07e710be2058d2b4e"
+        "AMI": "ami-0351e579badbccc02"
       },
       "us-west-2": {
-        "AMI": "ami-0a66253c970e57c38"
+        "AMI": "ami-0b95d51a9d30411b6"
       },
       "ca-central-1": {
-        "AMI": "ami-05e1ad550450833e2"
+        "AMI": "ami-042cbc287e8e1abe6"
       },
       "eu-central-1": {
-        "AMI": "ami-0738b1d230479f326"
+        "AMI": "ami-0154b9059a044c6ac"
       },
       "eu-west-1": {
-        "AMI": "ami-05e76f6f8214345ec"
+        "AMI": "ami-077c4a70ac75233a7"
       },
       "eu-west-2": {
-        "AMI": "ami-012db46dc46447ee3"
+        "AMI": "ami-02250dd5e4f81df0a"
       },
       "eu-west-3": {
-        "AMI": "ami-000af48ec80203296"
+        "AMI": "ami-027f49762d417e409"
       },
       "eu-north-1": {
-        "AMI": "ami-05ce18c64d129d23e"
+        "AMI": "ami-0020975c8876b2b18"
       },
       "sa-east-1": {
-        "AMI": "ami-0058ae5dab119030d"
+        "AMI": "ami-07b4fdd976d6257d5"
       },
       "me-south-1": {
-        "AMI": "ami-0aaca1b5bf2d54985"
+        "AMI": "ami-048c500872d978a91"
       },
       "ap-east-1": {
-        "AMI": "ami-04d10c7b779ab6cfe"
+        "AMI": "ami-05b38223c2a7a9e14"
       },
       "ap-south-1": {
-        "AMI": "ami-09e4db19cf97a53e5"
+        "AMI": "ami-078c2d1235244eb41"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0bdc9132f845903f6"
+        "AMI": "ami-0e94eed9d287b044d"
       },
       "ap-northeast-2": {
-        "AMI": "ami-0d9c6fb16d4e6dae9"
+        "AMI": "ami-095308e202eec865a"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0bd80aa86453db110"
+        "AMI": "ami-0fd6237270257a025"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0b042d9ffa1e29e93"
+        "AMI": "ami-04ca05ea4da62b426"
       }
     }
   },
@@ -678,14 +678,14 @@
     }
   },
   "Parameters": {
-    "InstanceType": {
-      "Description": "The AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types.",
-      "Default": "m5.xlarge",
-      "Type": "String"
-    },
     "InstanceName": {
       "Description": "Give your MATLAB virtual machine a name",
       "Default": "MATLAB Desktop",
+      "Type": "String"
+    },
+    "InstanceType": {
+      "Description": "The AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types.",
+      "Default": "m5.xlarge",
       "Type": "String"
     },
     "RootVolumeSize": {
@@ -701,24 +701,6 @@
       "Default": "",
       "Type": "String"
     },
-    "VPC": {
-      "Description": "ID of an existing VPC in which to deploy this stack",
-      "Type": "AWS::EC2::VPC::Id",
-      "ConstraintDescription": "Must be the Id of an existing VPC.",
-      "AllowedPattern": ".+"
-    },
-    "Subnet": {
-      "Description": "List of existing subnets IDs",
-      "Type": "AWS::EC2::Subnet::Id",
-      "ConstraintDescription": "Must be the ID of an existing Subnet within the chosen VPC.",
-      "AllowedPattern": ".+"
-    },
-    "RDPKeyName": {
-      "Description": "The name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these.",
-      "Type": "AWS::EC2::KeyPair::KeyName",
-      "ConstraintDescription": "Must be the name of an existing EC2 KeyPair.",
-      "AllowedPattern": ".+"
-    },
     "ClientIPAddress": {
       "Description": "The IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as <ip_address>/<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate.",
       "Type": "String",
@@ -726,6 +708,12 @@
       "MaxLength": "18",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "RDPKeyName": {
+      "Description": "The name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these.",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "Must be the name of an existing EC2 KeyPair.",
+      "AllowedPattern": ".+"
     },
     "Password": {
       "NoEcho": "true",
@@ -740,6 +728,32 @@
       "Type": "String",
       "ConstraintDescription": ""
     },
+    "VPC": {
+      "Description": "ID of an existing VPC in which to deploy this stack",
+      "Type": "AWS::EC2::VPC::Id",
+      "ConstraintDescription": "Must be the Id of an existing VPC.",
+      "AllowedPattern": ".+"
+    },
+    "Subnet": {
+      "Description": "List of existing subnets IDs",
+      "Type": "AWS::EC2::Subnet::Id",
+      "ConstraintDescription": "Must be the ID of an existing Subnet within the chosen VPC.",
+      "AllowedPattern": ".+"
+    },
+    "AdditionalSecurityGroup": {
+      "Description": "The ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group.",
+      "Type": "String",
+      "Default": ""
+    },
+    "UseElasticIP": {
+      "Description": "Allocate an Elastic IP address for your EC2 instance. This allows your machine to preserve its IP address across reboots. Note the elastic IPs are limited, check with your account administrator.",
+      "Type": "String",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ],
+      "Default": "No"
+    },
     "LicenseManager": {
       "Description": "Optional License Manager for MATLAB string in the form <port>@<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host.",
       "Type": "String",
@@ -749,20 +763,6 @@
     },
     "EnableCloudWatch": {
       "Description": "Choose whether you want to enable cloudwatch logging for the MATLAB instance",
-      "Type": "String",
-      "AllowedValues": [
-        "Yes",
-        "No"
-      ],
-      "Default": "No"
-    },
-    "AdditionalSecurityGroup": {
-      "Description": "The ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group.",
-      "Type": "String",
-      "Default": ""
-    },
-    "UseElasticIP": {
-      "Description": "Allocate an Elastic IP address for your EC2 instance. This allows your machine to preserve its IP address across reboots. Note the elastic IPs are limited, check with your account administrator.",
       "Type": "String",
       "AllowedValues": [
         "Yes",
