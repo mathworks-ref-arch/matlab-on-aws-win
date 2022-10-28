@@ -38,20 +38,21 @@ After you click the Launch Stack button above, the “Create stack” page will 
 
 | Parameter label | Description |
 | --------------- | ----------- |
-| **Instance Name** | Give your MATLAB virtual machine a name |
-| **AWS EC2 Instance type** | The AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types. |
-| **Storage Size (GiB)** | Specify the size in GB of the root volume |
-| **IAM Role (Optional)** | Specify an IAM Role to associate with this instance. If not specified, PredefinedRole IAM role is used which is required for NiceDCV remote connectivity feature. If specified, only RDP access is available. |
-| **Allow RDP and SSH connections from** | The IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
-| **RDP Key Pair** | The name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
-| **Remote password** | Enter a password for the user Administrator |
-| **Confirm remote password** | Confirm Password |
+| **AWS EC2 Instance type** | AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types. |
+| **Instance Name** | Name for the MATLAB virtual machine |
+| **Storage Size (GiB)** | Size in GB of the root volume |
+| **Custom IAM Role (Optional)** | Name of a custom IAM Role to associate with this instance. If not specified, a predefined role is used. If specified, features requiring special permissions will be unavailable (NICE DCV, CloudWatch, IAM Policies). |
+| **Additional IAM Policies (Optional)** | Semicolon-delimited list of IAM Policy ARNs to add to the predefined role. This option cannot be used with a custom IAM Role. |
 | **VPC to deploy this stack to** | ID of an existing VPC in which to deploy this stack |
-| **Subnet** | List of existing subnets IDs |
-| **Additional security group to place instances in** | The ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
-| **Use Elastic IP address that persists across machine reboots** | Allocate an Elastic IP address for your EC2 instance. This allows your machine to preserve its IP address across reboots. Note the elastic IPs are limited, check with your account administrator. |
+| **Subnet** | ID of an existing subnet |
+| **RDP Key Pair** | Name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
+| **Allow RDP and SSH connections from** | IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
+| **Remote password** | Password for the user Administrator |
+| **Confirm remote password** | Confirm Password |
 | **License Manager for MATLAB connection string** | Optional License Manager for MATLAB string in the form \<port>@\<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host. |
-| **Configure cloudwatch logging for the MATLAB instance** | Choose whether you want to enable cloudwatch logging for the MATLAB instance |
+| **Configure cloudwatch logging for the MATLAB instance** | Flag indicating whether cloudwatch logging for the MATLAB instance is enabled. |
+| **Additional security group to place instances in** | ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
+| **Use Elastic IP address that persists across machine reboots** | Flag indicating whether you want to keep the same public IP address for the instance. |
 | **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours |
 
 
