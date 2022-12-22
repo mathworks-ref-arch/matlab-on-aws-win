@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-059e96e9c619f116c"
+        "AMI": "ami-027c376bd24051b23"
       },
       "us-east-2": {
-        "AMI": "ami-0d4535d692c8a3d5d"
+        "AMI": "ami-0e1a0b47fdf0b5aca"
       },
       "us-west-1": {
-        "AMI": "ami-0351e579badbccc02"
+        "AMI": "ami-0cc7597e7e3642bb0"
       },
       "us-west-2": {
-        "AMI": "ami-0b95d51a9d30411b6"
+        "AMI": "ami-01f09e01e73f575d6"
       },
       "ca-central-1": {
-        "AMI": "ami-042cbc287e8e1abe6"
+        "AMI": "ami-09c1d6c90e35db2e7"
       },
       "eu-central-1": {
-        "AMI": "ami-0154b9059a044c6ac"
+        "AMI": "ami-099e2c1434792ee5f"
       },
       "eu-west-1": {
-        "AMI": "ami-077c4a70ac75233a7"
+        "AMI": "ami-0de2fd80cff2fcf7e"
       },
       "eu-west-2": {
-        "AMI": "ami-02250dd5e4f81df0a"
+        "AMI": "ami-061e1f6f98c2e4ac7"
       },
       "eu-west-3": {
-        "AMI": "ami-027f49762d417e409"
+        "AMI": "ami-0149bec39c6f3f23a"
       },
       "eu-north-1": {
-        "AMI": "ami-0020975c8876b2b18"
+        "AMI": "ami-0041dbeada7027023"
       },
       "sa-east-1": {
-        "AMI": "ami-07b4fdd976d6257d5"
+        "AMI": "ami-0195da6aa8a4320ba"
       },
       "me-south-1": {
-        "AMI": "ami-048c500872d978a91"
+        "AMI": "ami-01fe73d7420fa1933"
       },
       "ap-east-1": {
-        "AMI": "ami-05b38223c2a7a9e14"
+        "AMI": "ami-0c858f711e643e900"
       },
       "ap-south-1": {
-        "AMI": "ami-078c2d1235244eb41"
+        "AMI": "ami-0edbee09f3fb8c5d4"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0e94eed9d287b044d"
+        "AMI": "ami-0979ce3692f992bcd"
       },
       "ap-northeast-2": {
-        "AMI": "ami-095308e202eec865a"
+        "AMI": "ami-0da9b450a4abb17a1"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0fd6237270257a025"
+        "AMI": "ami-0140df8054452f571"
       },
       "ap-southeast-2": {
-        "AMI": "ami-04ca05ea4da62b426"
+        "AMI": "ami-0845eac7789aa8fa7"
       }
     }
   },
@@ -360,80 +360,85 @@
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
-              "",
+              "\n",
               [
-                "<powershell>\n",
-                "\"UserData from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "\"Logging configuration from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "& \"C:/Program Files/Amazon/AmazonCloudWatchAgent/Start-Logging.ps1\" -ENABLE_CLOUDWATCH_LOGGING ",
+                "<powershell>",
+                "# Copyright 2022 The MathWorks, Inc.",
+                "",
+                "$StartupFolder = \"$Env:ProgramFiles\\MathWorks\\startup\"",
+                "# Load startup variables",
+                "If (Test-Path $StartupFolder\\env.ps1) {",
+                "    . $StartupFolder\\env.ps1",
+                "}",
+                "",
+                "# Define startup parameters",
                 {
-                  "Ref": "EnableCloudWatch"
-                },
-                " -METRICS_COLLECTION_INTERVAL_IN_SECS 60 -LOG_GROUP_NAME ",
-                {
-                  "Fn::Join": [
-                    "-",
-                    [
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      {
-                        "Fn::Select": [
-                          "2",
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Ref": "AWS::StackId"
-                              }
-                            ]
-                          }
-                        ]
+                  "Fn::Sub": [
+                    "$Env:Password='${PasswordBase64}'",
+                    {
+                      "PasswordBase64": {
+                        "Fn::Base64": {
+                          "Ref": "Password"
+                        }
                       }
-                    ]
+                    }
                   ]
                 },
-                "\n",
-                "\"Logging configuration from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "\"LicenseManager configuration started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "if (-not ([string]::IsNullOrEmpty(\"",
                 {
-                  "Ref": "LicenseManager"
+                  "Fn::Sub": "$Env:MLMLicenseFile='${LicenseManager}'"
                 },
-                "\"))){",
-                "& C:/Windows/Temp/license-manager.ps1 -FlexServer ",
                 {
-                  "Ref": "LicenseManager"
+                  "Fn::Sub": [
+                    "$Env:CloudLogName='${LogGroupName}'",
+                    {
+                      "LogGroupName": {
+                        "Fn::If": [
+                          "UseCloudWatch",
+                          {
+                            "Fn::Join": [
+                              "-",
+                              [
+                                {
+                                  "Ref": "AWS::StackName"
+                                },
+                                {
+                                  "Fn::Select": [
+                                    "2",
+                                    {
+                                      "Fn::Split": [
+                                        "/",
+                                        {
+                                          "Ref": "AWS::StackId"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            ]
+                          },
+                          ""
+                        ]
+                      }
+                    }
+                  ]
                 },
-                "}\n",
-                "\"LicenseManager configuration ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "Set-Content -Path \"C:\\Windows\\Temp\\pass.txt\" -Value ",
+                "",
+                "# Run startup scripts",
+                "Start-Transcript -Path $Env:ProgramData\\MathWorks\\startup.log -Append",
+                "Get-ChildItem $StartupFolder | Where-Object { $_ -match '^[0-9]+_.+$' } | Sort-Object | ForEach-Object {",
+                "    Write-Output \"startup: executing $_\"",
+                "    $Start = Get-Date",
+                "    & $_.FullName",
+                "    Write-Output \"startup: finished after $(((Get-Date) - $Start).TotalSeconds)s\"",
+                "}",
+                "Stop-Transcript",
+                "",
+                "# Signal the status from cfn-init",
                 {
-                  "Fn::Base64": {
-                    "Ref": "Password"
-                  }
+                  "Fn::Sub": "& \"$Env:ProgramFiles\\Amazon\\cfn-bootstrap\\cfn-signal\" -e $lastexitcode --stack ${AWS::StackName} --region ${AWS::Region} --resource MATLABEC2Instance"
                 },
-                "\n",
-                "$dpass=[Text.Encoding]::Utf8.GetString([Convert]::FromBase64String((Get-Content \"C:\\Windows\\Temp\\pass.txt\")))\n",
-                "net user Administrator $dpass\n",
-                "Remove-Item \"C:\\Windows\\Temp\\pass.txt\"\n",
-                "\"Warmup from CFT started at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "& C:/ProgramData/MathWorks/warmup-matlab.ps1\n",
-                "\"Warmup from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "& \"C:\\Program Files\\Amazon\\cfn-bootstrap\\cfn-signal\" ",
-                " --stack ",
-                {
-                  "Ref": "AWS::StackName"
-                },
-                " --resource MATLABEC2Instance",
-                " --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n",
-                "Set-Content -Path \"C:\\Windows\\NVIDIADrivers\\instances-supporting-grid-drivers.txt\" -Value \"g3,g4dn,g5\"\n",
-                "\"UserData from CFT ended at: $(Get-Date)\" >> C:\\Windows\\Temp\\UserData.log\n",
-                "</powershell>\n",
+                "</powershell>",
                 "<persist>true</persist>"
               ]
             ]
