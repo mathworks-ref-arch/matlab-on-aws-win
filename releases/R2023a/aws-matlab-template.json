@@ -813,7 +813,7 @@
       "Default": "Never"
     },
     "OptionalUserCommand": {
-      "Description": "Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: <[System.Environment]::SetEnvironmentVariable(\"CLOUD\",\"AWS\", \"Machine\");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: <Invoke-WebRequest \"https://somedomain.com/script.ps1\" -OutFile script.ps1; .\\script.ps1>. Find the logs at '$Env:ProgramData\\MathWorks\\startup.log'.",
+      "Description": "Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: <[System.Environment]::SetEnvironmentVariable(\"CLOUD\",\"AWS\", \"Machine\");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: <Invoke-WebRequest \"https://www.example.com/script.ps1\" -OutFile script.ps1; .\\script.ps1>. Find the logs at '$Env:ProgramData\\MathWorks\\startup.log'.",
       "Type": "String",
       "Default": ""
     }
