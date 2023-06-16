@@ -2,7 +2,7 @@
 
 ## Requirements
 Before starting, you will need the following:
-* A MATLAB&reg; license. For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
+* A MATLAB&reg; license. For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
 * An Amazon Web Services&trade; (AWS) account.
 * A Key Pair for your AWS account in the appropriate region. For more information, see [Amazon EC2 Key Pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).
 
@@ -35,6 +35,7 @@ To view instructions for deploying the MATLAB reference architecture, select a M
 | [R2020a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2020a/README.md) |  |
 | [R2019b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2019b/README.md) |  |
 | [R2019a\_and\_older](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2019a_and_older/README.md) |  |
+
 
 The above instructions allow you to launch instances based on the latest MathWorks&reg; Amazon Machine Images (AMIs).
 MathWorks periodically replaces older AMIs with new images.
