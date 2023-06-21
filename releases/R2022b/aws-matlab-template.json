@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-0a0cbfc9208ebc08d"
+        "AMI": "ami-0840ee9efa7d2b861"
       },
       "us-east-2": {
-        "AMI": "ami-040224fe77eff293c"
+        "AMI": "ami-09c9b9eaaee89c01a"
       },
       "us-west-1": {
-        "AMI": "ami-07b6c3b8619ef833c"
+        "AMI": "ami-0bc12a292cc2c8c10"
       },
       "us-west-2": {
-        "AMI": "ami-0cacb739f609cafeb"
+        "AMI": "ami-0a5e157df6495a61a"
       },
       "ca-central-1": {
-        "AMI": "ami-03ddfcda7267d6855"
+        "AMI": "ami-0b4c423153d9427f9"
       },
       "eu-central-1": {
-        "AMI": "ami-004345ae8e467d5d0"
+        "AMI": "ami-08770e3328adfcee0"
       },
       "eu-west-1": {
-        "AMI": "ami-00aa58721476abf8a"
+        "AMI": "ami-0984d1311b9877842"
       },
       "eu-west-2": {
-        "AMI": "ami-0cee425a35ae70ac5"
+        "AMI": "ami-0d93dd3b53f809089"
       },
       "eu-west-3": {
-        "AMI": "ami-08890426eb140b7a0"
+        "AMI": "ami-09fd7d370431c4fe8"
       },
       "eu-north-1": {
-        "AMI": "ami-0ac7d29a85a6b75d4"
+        "AMI": "ami-0c53129feb4b71556"
       },
       "sa-east-1": {
-        "AMI": "ami-02cb1631b802a3483"
+        "AMI": "ami-0df2614a59c614221"
       },
       "me-south-1": {
-        "AMI": "ami-03c5077d156311e1c"
+        "AMI": "ami-06d95e7ea42db0d90"
       },
       "ap-east-1": {
-        "AMI": "ami-071ef49c47106ab1f"
+        "AMI": "ami-0cfb9faa693592bd3"
       },
       "ap-south-1": {
-        "AMI": "ami-06224022125a159be"
+        "AMI": "ami-0726a43a451f6c0b1"
       },
       "ap-northeast-1": {
-        "AMI": "ami-08d91ce5f1ba3fd27"
+        "AMI": "ami-0b1a26729101c1a15"
       },
       "ap-northeast-2": {
-        "AMI": "ami-02ec734bb35da90ef"
+        "AMI": "ami-0650da3cfb92679bf"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0663fd8fc18ce5061"
+        "AMI": "ami-008684c2c66c2aafe"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0c14414acba64ee95"
+        "AMI": "ami-01972803917c1b00b"
       }
     }
   },
@@ -241,6 +241,166 @@
         ]
       }
     },
+    "AttachInstanceProfileLambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "attachprofile-policy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "cloudformation:DescribeStackResource",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:cloudformation:${region}:${accountId}:stack/*",
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "accountId": {
+                          "Ref": "AWS::AccountId"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "iam:PassRole",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:iam::${accountId}:role/${role}",
+                      {
+                        "accountId": {
+                          "Ref": "AWS::AccountId"
+                        },
+                        "role": {
+                          "Fn::If": [
+                            "UsePredefinedRole",
+                            {
+                              "Ref": "PredefinedRole"
+                            },
+                            {
+                              "Ref": "CustomIamRole"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:AssociateIamInstanceProfile"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:ec2:${region}:${accountId}:instance/*",
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "accountId": {
+                          "Ref": "AWS::AccountId"
+                        }
+                      }
+                    ]
+                  },
+                  "Condition": {
+                    "StringEquals": {
+                      "aws:ResourceTag/aws:cloudformation:stack-name": {
+                        "Fn::Sub": [
+                          "${stack}",
+                          {
+                            "stack": {
+                              "Ref": "AWS::StackName"
+                            }
+                          }
+                        ]
+                      },
+                      "aws:ResourceTag/aws:cloudformation:logical-id": "MATLABEC2Instance"
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:logs:${region}:${accountId}:log-group:/aws/lambda/*",
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "accountId": {
+                          "Ref": "AWS::AccountId"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AttachInstanceProfileLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Role": {
+          "Fn::GetAtt": [
+            "AttachInstanceProfileLambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Handler": "index.lambda_handler",
+        "Timeout": "300",
+        "Code": {
+          "ZipFile": "# Copyright 2023 The MathWorks Inc.\nimport http, json, os, uuid, boto3\nfrom urllib.parse import urlparse\nfrom botocore.waiter import WaiterModel as Waiter, create_waiter_with_client as create_waiter\n\nINSTANCE_ID=os.environ['EC2_INSTANCE_ID']\nPROFILE_ID=os.environ['INSTANCE_PROFILE_ID']\nREGION=os.environ['AWS_REGION']\nLOG_GROUP='https://'+REGION+'.console.aws.amazon.com/cloudwatch/home?region='+REGION+'#logsV2:log-groups/log-group/$252Faws$252Flambda$252F'+os.environ['AWS_LAMBDA_FUNCTION_NAME']\n\ndef get_waiter_cfg(operation,argument,expected):\n    cfg={\"version\":2,\"waiters\":{\"CustomWaiter\":{\"delay\":2,\"operation\":operation,\"maxAttempts\":90,\"acceptors\":[{\"matcher\":\"path\",\"expected\":True,\"argument\":argument,\"state\":\"success\"},{\"matcher\":\"error\",\"expected\":expected,\"state\":\"retry\",\"argument\":\"Code\"}]}}}\n    return cfg\n\ndef get_resources(stack,response):\n    cfn=boto3.client('cloudformation')\n    res={}\n    waiter_cfg=get_waiter_cfg(\"DescribeStackResource\",\"StackResourceDetail.ResourceStatus==`CREATE_IN_PROGRESS` || StackResourceDetail.ResourceStatus==`CREATE_COMPLETE`\",\"ValidationError\")\n    waiter=create_waiter('CustomWaiter', Waiter(waiter_cfg), cfn)\n    for id in [INSTANCE_ID, PROFILE_ID]:\n        try:\n            waiter.wait(StackName=stack,LogicalResourceId=id)\n            resource=cfn.describe_stack_resource(StackName=stack,LogicalResourceId=id)\n            res[id]=resource['StackResourceDetail']['PhysicalResourceId']\n        except Exception as E:\n            print(E)\n            response['Reason']='Failed to get information on EC2 instance or instance profile. Check the log stream under the CloudWatch log group: '+LOG_GROUP\n    return res\n\ndef send_response(request,response):\n    url=urlparse(request['ResponseURL'])\n    body=json.dumps(response)\n    https=http.client.HTTPSConnection(url.netloc)\n    https.request('PUT', url.path+'?'+url.query,body)\n    return response\n \ndef lambda_handler(event,context): \n    response={'StackId':event['StackId'],'RequestId':event['RequestId'],'LogicalResourceId':event['LogicalResourceId'],'Status':'SUCCESS'}\n    stack=str(event['StackId']).split('/')[1]\n    if 'PhysicalResourceId' in event:\n        response['PhysicalResourceId']=event['PhysicalResourceId']\n    else:\n        response['PhysicalResourceId']=str(uuid.uuid4())\n    if event['RequestType'] == 'Delete':\n        return send_response(event,response)\n    try:\n        ec2=boto3.client('ec2')\n        resources=get_resources(stack,response)\n        waiter_cfg=get_waiter_cfg(\"AssociateIamInstanceProfile\",\"IamInstanceProfileAssociation.State==`associated` || IamInstanceProfileAssociation.State==`associating`\",\"InvalidParameterValue\")\n        waiter=create_waiter('CustomWaiter', Waiter(waiter_cfg), ec2)\n        waiter.wait(IamInstanceProfile={'Name':resources[PROFILE_ID]},InstanceId=resources[INSTANCE_ID])\n        response['Reason']='Attached instance profile successfully'\n        print(response['Reason'])\n    except Exception as E:\n        print(E)\n        response['Status']='FAILED'\n        if 'Reason' not in response:\n           response['Reason']='Failed to attach instance profile to the EC2 instance. Check the log stream under the CloudWatch log group: '+LOG_GROUP\n    return send_response(event,response)"
+        },
+        "Environment": {
+          "Variables": {
+            "EC2_INSTANCE_ID": "MATLABEC2Instance",
+            "INSTANCE_PROFILE_ID": "MATLABInstanceProfile"
+          }
+        }
+      }
+    },
+    "AttachInstanceProfileToEC2": {
+      "Type": "AWS::CloudFormation::CustomResource",
+      "Version": "1.0",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "AttachInstanceProfileLambda",
+            "Arn"
+          ]
+        }
+      }
+    },
     "MATLABInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -332,9 +492,6 @@
         "SubnetId": {
           "Ref": "Subnet"
         },
-        "IamInstanceProfile": {
-          "Ref": "MATLABInstanceProfile"
-        },
         "InstanceType": {
           "Ref": "InstanceType"
         },
@@ -363,7 +520,7 @@
               "\n",
               [
                 "<powershell>",
-                "# Copyright 2022 The MathWorks, Inc.",
+                "# Copyright 2022-2023 The MathWorks, Inc.",
                 "",
                 "$StartupFolder = \"$Env:ProgramFiles\\MathWorks\\startup\"",
                 "# Load startup variables",
@@ -422,6 +579,9 @@
                       }
                     }
                   ]
+                },
+                {
+                  "Fn::Sub": "$Env:OptionalUserCommand='${OptionalUserCommand}'"
                 },
                 "",
                 "# Run startup scripts",
@@ -494,18 +654,16 @@
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "ZipFile": {
-            "Fn::Sub": [
-              "import json\nfrom logging import shutdown\nimport boto3\nfrom datetime import datetime, timedelta\nimport re\n\nec2 = boto3.client(\"ec2\")\nDEFAULT_TIME_INTERVAL=\"${DEFAULT_TIME_INTERVAL}\"\n\n# Uniquely identify instance using AWS-provided stack-level tags\nresponse = ec2.describe_instances(\n                Filters=[\n                    {\n                        'Name':'tag:aws:cloudformation:stack-name',\n                        'Values':['${STACK_NAME}']\n                    },\n                    {\n                        'Name':'tag:aws:cloudformation:logical-id',\n                        'Values':['MATLABEC2Instance']\n                    }\n                ]\n        )\n\nINSTANCE_ID=response[\"Reservations\"][0][\"Instances\"][0][\"InstanceId\"]\n\nLOG_MESSAGES={\n    \"instance-is-stopped\": \"Instance is stopped.\",\n    \"tag-is-never\": \"Autoshutdown is not enabled. Change the value of mw-autoshutdown tag of the EC2 instance to enable the autoshutdown feature.\",\n    \"tag-is-invalid\": \"The value of the mw-autoshutdown tag you have set is not valid. The format of the timestamp must be a valid RFC 1123 UTC timestamp, such as Thu, 16 Dec 2021 12:28:47 GMT.\",\n    \"instance-just-booted\": \"Instance has just started. Setting mw-autoshutdown value.\",\n    \"ready-to-shutdown\": \"Shutdown time has been reached. Shutting instance down.\",\n    \"too-early-to-shutdown\": \"Shutdown time has not been reached yet. Too early to shutdown instance.\"\n   }\n\ndef log_to_cloudwatch(message_id):\n    print(LOG_MESSAGES[message_id])\n\ndef get_start_time():\n    # Get boot time. This is always UTC\n    launch_time = response[\"Reservations\"][0][\"Instances\"][0][\"LaunchTime\"]\n    return re.sub(r\"\\+00:00\",\"\",str(launch_time))\n\ndef get_shutdown_tag():\n    instance_tags = response[\"Reservations\"][0][\"Instances\"][0][\"Tags\"]\n    shutdown_tag = next((tag for tag in instance_tags if tag[\"Key\"] == \"mw-autoshutdown\"), None)\n    return shutdown_tag\n\ndef set_shutdown_tag(shutdown_time):\n    ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-autoshutdown\",\"Value\": str(shutdown_time)}])\n\ndef set_last_autoshutdown_event_tag(shutdown_time):\n    ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-last-autoshutdown-event\",\"Value\": str(shutdown_time)}])\n\ndef clear_shutdown_tag():\n    ec2.delete_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-autoshutdown\"}])\n\ndef set_shutdown_time():\n    time_interval_before_shutdown = int(re.findall(\"[0-9]+\", DEFAULT_TIME_INTERVAL)[0])\n    launch_time = datetime.fromisoformat(get_start_time())\n    shutdown_time = launch_time + timedelta(hours=int(time_interval_before_shutdown))\n    shutdown_time_formatted = datetime.strftime(shutdown_time,'%a, %d %b %Y %H:%M:%S GMT')\n    set_shutdown_tag(shutdown_time_formatted)\n\ndef is_instance_stopped():\n    status = response[\"Reservations\"][0][\"Instances\"][0][\"State\"][\"Name\"]\n    if status == \"stopped\":\n        return True\n    return False\n\ndef lambda_handler(event, context):\n\n    # Don\"t do anything while the instance is stopped.\n    if is_instance_stopped():\n        log_to_cloudwatch(message_id=\"instance-is-stopped\")\n        return {\"statusCode\": 200}\n\n    shutdown_tag = get_shutdown_tag()\n\n    # When the lambda function first runs, the tag doesn't exist yet.\n    # Use the specified option to determine what to do.\n    if shutdown_tag is None:\n        if DEFAULT_TIME_INTERVAL == \"Never\":\n            # Set the tag to \"never\".\n            set_shutdown_tag(\"never\")\n            # Don't do anything when tag is \"never\"\n            log_to_cloudwatch(message_id=\"tag-is-never\")\n            return {\"statusCode\": 200}\n        else:\n            # Set the tag to start time + user chosen time interval.\n            set_shutdown_time()\n            log_to_cloudwatch(message_id=\"instance-just-booted\")\n            return {\"statusCode\": 200}\n\n    # If the tag exists, then use it to determine what to do.\n    if shutdown_tag[\"Value\"] == \"change_me_on_boot\":\n        set_shutdown_time()\n        log_to_cloudwatch(message_id=\"instance-just-booted\")\n        return {\"statusCode\": 200}\n    elif shutdown_tag[\"Value\"] == \"never\":\n        # Don't do anything when tag is \"never\"\n        log_to_cloudwatch(message_id=\"tag-is-never\")\n        return {\"statusCode\": 200}\n    else:\n        # Check the tag value to determine whether instance needs to be shutdown.\n        try:\n            shutdown_time = datetime.strptime(shutdown_tag[\"Value\"],'%a, %d %b %Y %H:%M:%S GMT')\n        except ValueError:\n            log_to_cloudwatch(message_id=\"tag-is-invalid\")\n            return {\"statusCode\": 200}\n        timezone = shutdown_time.tzinfo\n        current_time = datetime.now(timezone)\n\n        if current_time > shutdown_time:\n            ec2.stop_instances(InstanceIds=[INSTANCE_ID])\n\n            # Explicitly set the shutdown time as mw-last-autoshutdown-event tag\n            current_time_formatted = datetime.strftime(current_time, '%a, %d %b %Y %H:%M:%S GMT')\n            set_last_autoshutdown_event_tag(current_time_formatted)\n\n            log_to_cloudwatch(message_id=\"ready-to-shutdown\")\n\n            # If the DEFAULT_TIME_INTERVAL is never, set the tag to never. Otherwise, give the tag an empty value.\n            if DEFAULT_TIME_INTERVAL == \"Never\":\n                set_shutdown_tag(\"never\")\n            else:\n                set_shutdown_tag(\"change_me_on_boot\")\n            return {\"statusCode\": 200}\n        else:\n            log_to_cloudwatch(message_id=\"too-early-to-shutdown\")\n            return {\"statusCode\": 200}",
-              {
-                "STACK_NAME": {
-                  "Ref": "AWS::StackName"
-                },
-                "DEFAULT_TIME_INTERVAL": {
-                  "Ref": "AutoShutdown"
-                }
-              }
-            ]
+          "ZipFile": "# Copyright 2021-23 The MathWorks Inc.\nimport boto3,os,re\nfrom datetime import datetime as dt,timedelta\n\nec2=boto3.client(\"ec2\")\nDEFAULT_TIME_INTERVAL=os.environ['DEFAULT_TIME_INTERVAL']\n# Uniquely identify instance using AWS-provided stack-level tags\nres=ec2.describe_instances(Filters=[{'Name':'tag:aws:cloudformation:stack-name','Values':[os.environ['STACK_NAME']]},{'Name':'tag:aws:cloudformation:logical-id','Values':['MATLABEC2Instance']},{'Name': 'instance-state-name','Values': ['running', 'pending']}])\nINSTANCE=res[\"Reservations\"][0][\"Instances\"][0]\nINSTANCE_ID=INSTANCE[\"InstanceId\"]\nLOG_MESSAGES={\"instance-stopped\":\"Instance is stopped.\",\"tag-never\":\"Autoshutdown is not enabled. Change the value of mw-autoshutdown tag of the EC2 instance to enable the autoshutdown feature.\",\"tag-invalid\":\"The value of the mw-autoshutdown tag you have set is not valid. The format of the timestamp must be a valid RFC 1123 UTC timestamp, such as Thu, 16 Dec 2021 12:28:47 GMT.\",\"instance-booted\":\"Instance has just started. Setting mw-autoshutdown value.\",\"stop-instance\":\"Shutdown time has been reached. Shutting instance down.\",\"early-to-shutdown\":\"Shutdown time has not been reached yet. Too early to shutdown instance.\"}\nRET_VAL={\"statusCode\": 200}\n\ndef log_to_cloudwatch(id):\n    print(LOG_MESSAGES[id])\n\ndef get_start_time():\n    launch_time=INSTANCE[\"LaunchTime\"]\n    return re.sub(r\"\\+00:00\",\"\",str(launch_time))\n\ndef get_shutdown_tag():\n    tags=INSTANCE[\"Tags\"]\n    shutdown_tag=next((tag for tag in tags if tag[\"Key\"]==\"mw-autoshutdown\"), None)\n    return shutdown_tag\n\ndef set_shutdown_tag(shutdown_time):\n    ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-autoshutdown\",\"Value\": str(shutdown_time)}])\n\ndef set_shutdown_time():\n    time_interval=int(re.findall(\"[0-9]+\",DEFAULT_TIME_INTERVAL)[0])\n    launch_time=dt.fromisoformat(get_start_time())\n    shutdown_time=launch_time+timedelta(hours=int(time_interval))\n    shutdown_time_gmt=dt.strftime(shutdown_time,'%a, %d %b %Y %H:%M:%S GMT')\n    set_shutdown_tag(shutdown_time_gmt)\n\ndef lambda_handler(event, context):\n    # No action while the instance is stopped.\n    if INSTANCE[\"State\"][\"Name\"]==\"stopped\":\n        log_to_cloudwatch(id=\"instance-stopped\")\n        return RET_VAL\n    shutdown_tag=get_shutdown_tag()\n    # In the first function run, use DEFAULT_TIME_INTERVAL to determine what to do.\n    if shutdown_tag is None:\n        if DEFAULT_TIME_INTERVAL==\"Never\":\n            # Set the tag to \"never\".\n            set_shutdown_tag(\"never\")\n            # No action when tag is \"never\"\n            log_to_cloudwatch(id=\"tag-never\")\n            return RET_VAL\n        else:\n            # Set the tag to start time + user chosen time interval.\n            set_shutdown_time()\n            log_to_cloudwatch(id=\"instance-booted\")\n            return RET_VAL\n    # If the tag exists, use it to determine what to do.\n    if shutdown_tag[\"Value\"]==\"change_me_on_boot\":\n        set_shutdown_time()\n        log_to_cloudwatch(id=\"instance-booted\")\n        return RET_VAL\n    elif shutdown_tag[\"Value\"]==\"never\":\n        # No action when tag is \"never\"\n        log_to_cloudwatch(id=\"tag-never\")\n        return RET_VAL\n    else:\n        # Check the tag value to determine whether instance needs to be shutdown.\n        try:\n            shutdown_time=dt.strptime(shutdown_tag[\"Value\"],'%a, %d %b %Y %H:%M:%S GMT')\n        except ValueError:\n            log_to_cloudwatch(id=\"tag-invalid\")\n            return RET_VAL\n        curr_time=dt.now(shutdown_time.tzinfo)\n        if curr_time>shutdown_time:\n            ec2.stop_instances(InstanceIds=[INSTANCE_ID])\n            # Set the shutdown time as mw-last-autoshutdown-event tag\n            curr_time_gmt=dt.strftime(curr_time, '%a, %d %b %Y %H:%M:%S GMT')\n            ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-last-autoshutdown-event\",\"Value\": str(curr_time_gmt)}])\n            log_to_cloudwatch(id=\"stop-instance\")\n            if DEFAULT_TIME_INTERVAL==\"Never\":\n                set_shutdown_tag(\"never\")\n            else:\n                set_shutdown_tag(\"change_me_on_boot\")\n            return RET_VAL\n        else:\n            log_to_cloudwatch(id=\"early-to-shutdown\")\n            return RET_VAL"
+        },
+        "Environment": {
+          "Variables": {
+            "DEFAULT_TIME_INTERVAL": {
+              "Ref": "AutoShutdown"
+            },
+            "STACK_NAME": {
+              "Ref": "AWS::StackName"
+            }
           }
         },
         "Handler": "index.lambda_handler",
@@ -748,7 +906,7 @@
       "ConstraintDescription": ""
     },
     "LicenseManager": {
-      "Description": "Optional License Manager for MATLAB string in the form <port>@<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host.",
+      "Description": "Optional License Manager for MATLAB, specified as a string in the form <port>@<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws.",
       "Type": "String",
       "Default": "",
       "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-]+)?",
@@ -808,6 +966,11 @@
         "After 24 hours"
       ],
       "Default": "Never"
+    },
+    "OptionalUserCommand": {
+      "Description": "Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: <[System.Environment]::SetEnvironmentVariable(\"CLOUD\",\"AWS\", \"Machine\");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: <Invoke-WebRequest \"https://www.example.com/script.ps1\" -OutFile script.ps1; .\\script.ps1>. Find the logs at '$Env:ProgramData\\MathWorks\\startup.log'.",
+      "Type": "String",
+      "Default": ""
     }
   },
   "Rules": {
@@ -1094,6 +1257,14 @@
           "Parameters": [
             "AutoShutdown"
           ]
+        },
+        {
+          "Label": {
+            "default": "Optional User Command"
+          },
+          "Parameters": [
+            "OptionalUserCommand"
+          ]
         }
       ],
       "ParameterLabels": {
@@ -1141,6 +1312,9 @@
         },
         "UseElasticIP": {
           "default": "Use Elastic IP address that persists across machine reboots"
+        },
+        "OptionalUserCommand": {
+          "default": "Optional user inline command"
         }
       }
     }
