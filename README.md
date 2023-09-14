@@ -26,6 +26,7 @@ To view instructions for deploying the MATLAB reference architecture, select a M
 
 | Linux | Windows |
 | ----- | ------- |
+| [R2023b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023b/README.md) | [R2023b](releases/R2023b/README.md) |
 | [R2023a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023a/README.md) | [R2023a](releases/R2023a/README.md) |
 | [R2022b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2022b/README.md) | [R2022b](releases/R2022b/README.md) |
 | [R2022a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2022a/README.md) | [R2022a](releases/R2022a/README.md) |
