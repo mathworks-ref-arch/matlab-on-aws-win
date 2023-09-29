@@ -3,7 +3,7 @@
 ## Requirements
 Before starting, you will need the following:
 * A MATLAB&reg; license. For more information, see [Confirm Licensing for MathWorks Products Running on the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
-* An Amazon Web Services&trade; (AWS) account.
+* An Amazon Web Services&reg; (AWS) account.
 * A Key Pair for your AWS account in the appropriate region. For more information, see [Amazon EC2 Key Pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).
 
 ## Costs
@@ -116,3 +116,9 @@ The AMI uses MathWorks Hosted License Manager by default. For information on how
 
 # Technical Support
 If you require assistance or have a request for additional features or capabilities, please contact [MathWorks Technical Support](https://www.mathworks.com/support/contact_us.html).
+
+----
+
+Copyright 2018-2023 The MathWorks, Inc.
+
+----

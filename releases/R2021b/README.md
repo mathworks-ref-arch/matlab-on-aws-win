@@ -2,7 +2,7 @@
 
 ## Step 1. Launch the Template
 
-Click the **Launch Stack** button to deploy a standalone MATLAB desktop client on AWS. This will open the CloudFormation Create Stack screen in your web browser.
+Click the **Launch Stack** button to deploy a standalone MATLAB&reg; desktop client on AWS&reg;. This will open the CloudFormation Create Stack screen in your web browser.
 
 | Region | Launch Link |
 | --------------- | ----------- |
@@ -38,24 +38,26 @@ After you click the Launch Stack button above, the “Create stack” page will 
 
 | Parameter label | Description |
 | --------------- | ----------- |
-| **AWS EC2 Instance type** | The AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types. |
-| **Instance Name** | Give your MATLAB virtual machine a name |
-| **Storage Size (GiB)** | Specify the size in GB of the root volume |
-| **IAM Role (Optional)** | Specify an IAM Role to associate with this instance. If not specified, PredefinedRole IAM role is used which is required for NiceDCV remote connectivity feature. If specified, only RDP access is available. |
+| **AWS EC2 Instance type** | AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types. |
+| **Instance Name** | Name for the MATLAB virtual machine |
+| **Storage Size (GiB)** | Size in GB of the root volume |
+| **Custom IAM Role (Optional)** | Name of a custom IAM Role to associate with this instance. If not specified, a predefined role is used. If specified, features requiring special permissions will be unavailable (NICE DCV, CloudWatch, IAM Policies). |
+| **Additional IAM Policies (Optional)** | Semicolon-delimited list of IAM Policy ARNs to add to the predefined role. This option cannot be used with a custom IAM Role. |
 | **VPC to deploy this stack to** | ID of an existing VPC in which to deploy this stack |
-| **Subnet** | List of existing subnets IDs |
-| **RDP Key Pair** | The name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
-| **Allow RDP and SSH connections from** | The IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
-| **Remote password** | Enter a password for the user Administrator |
+| **Subnet** | ID of an existing subnet |
+| **RDP Key Pair** | Name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
+| **Allow RDP and SSH connections from** | IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
+| **Remote password** | Password for the user Administrator |
 | **Confirm remote password** | Confirm Password |
-| **License Manager for MATLAB connection string** | Optional License Manager for MATLAB string in the form \<port>@\<hostname>. If not specified, online licensing is used. If specified, the license manager must be accessible from the specified VPC and subnets. If the Network License Manager for MATLAB was deployed using the reference architecture, this can be achieved by specifying the security group of that deployment as the AdditionalSecurityGroup parameter, and by using the private hostname of the license manager host. |
-| **Configure cloudwatch logging for the MATLAB instance** | Choose whether you want to enable cloudwatch logging for the MATLAB instance |
-| **Additional security group to place instances in** | The ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
-| **Use Elastic IP address that persists across machine reboots** | Allocate an Elastic IP address for your EC2 instance. This allows your machine to preserve its IP address across reboots. Note the elastic IPs are limited, check with your account administrator. |
+| **License Manager for MATLAB connection string** | Optional License Manager for MATLAB, specified as a string in the form \<port>@\<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws. |
+| **Configure cloudwatch logging for the MATLAB instance** | Flag indicating whether cloudwatch logging for the MATLAB instance is enabled. |
+| **Additional security group to place instances in** | ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
+| **Use Elastic IP address that persists across machine reboots** | Flag indicating whether you want to keep the same public IP address for the instance. |
 | **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours |
+| **Optional user inline command** | Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: \<[System.Environment]::SetEnvironmentVariable("CLOUD","AWS", "Machine");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: \<Invoke-WebRequest "https://www.example.com/script.ps1" -OutFile script.ps1; .\script.ps1>. Find the logs at '$Env:ProgramData\MathWorks\startup.log'. |
 
 
->**Note**: If you chose to associate an IAM role above you'll need to acknowledge that it may create IAM resources in the Capabilities before creating the stack.
+>**Note**: In the capabilities section, you must acknowledge that AWS Cloudformation might create IAM resources and autoexpand nested templates when creating the stack.
 
 3. Click the **Create Stack** button.  The CloudFormation service will start creating the resources for the stack. <p>After clicking **Create** you will be taken to the *Stack Detail* page for your stack. Wait for the Status to reach **CREATE\_COMPLETE**. This may take up to 10 minutes.</p>
 
@@ -67,10 +69,10 @@ After you click the Launch Stack button above, the “Create stack” page will 
 1. In the login screen that's displayed, use the username `Administrator` and the password you specified while setting up the stack in [Step 2](#step-2-configure-the-stack).
 1. You can also connect using SSH from the terminal using the format: `ssh Administrator@<DNS name>`. *For example*: ssh Administrator@ec2-11-222-33-44.compute-1.amazonaws.com
 
-## Step 4. Launch MATLAB
-Double-click the MATLAB icon on the virtual machine desktop to launch MATLAB. The first time you start MATLAB you will need to activate it. By default, you will be asked to use your MathWorks Account to activate MATLAB. For other ways to activate MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/licensingoncloud/matlab-on-the-cloud.html).
+## Step 4. Start MATLAB
+Double-click the MATLAB icon on the virtual machine desktop to start MATLAB. The first time you start MATLAB, you need to enter your MathWorks&reg; Account credentials to license MATLAB. For other ways to license MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html). 
 
->**Note**: It may take a few minutes for activation to complete and MATLAB to start. You will experience this delay only the first time you start MATLAB.
+>**Note**: It may take up to a minute for MATLAB to start the first time.
 
 
 # Additional Information
@@ -79,7 +81,7 @@ Double-click the MATLAB icon on the virtual machine desktop to launch MATLAB. Th
 CloudWatch logs enables you to access logs from all the resources in your stack in a single place. To use CloudWatch logs, launch the stack with the feature "Configure cloudwatch logging for the MATLAB instance" enabled. Once the stack deployment is complete, you can access your logs in the "Outputs" of the stack by clicking the link next to "CloudWatchLogs". Note that if you delete the stack, the CloudWatch log group is also deleted. For more information, see [What is Amazon CloudWatch Logs?](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html).
 
 ## Installing NVIDIA GRID Drivers
-If you are running a GPU instance that belongs to `G3`, `G4dn` or `G5` instance type, you can use GPUs for compute with the default drivers, but you might need NVIDIA GRID drivers if you want to run 3D simulations (for example, with Automated Driving Toolbox). You can install NVIDIA GRID Drivers by running the `Install-NVIDIAGridDriver.ps1` script in the `C:\Windows\NVIDIADrivers\` directory. To complete the installation of GRID drivers, restart the machine when prompted by the script. For more details, please visit the official AWS documentation page: [Install NVIDIA drivers on Windows instances](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/install-nvidia-driver.html).
+If you are running a GPU instance that belongs to G3, G4dn or G5 instance type, you can install NVIDIA GRID Drivers using the `Install-NVIDIAGridDriver.ps1` script placed in the `C:\Windows\NVIDIADrivers\` directory. These drivers are certified to provide optimal performance for visualization applications that render content such as 3D models or high-resolution videos. Possible use cases include 4K resolution streaming via NICE DCV or using Automated Driving toolbox to run simulations in a rich 3D-environment. Please note that, for the installation of GRID drivers to complete, a machine restart is required.
 
 ## Delete Your Cloud Resources
 
@@ -88,9 +90,12 @@ Once you have finished using your stack, it is recommended that you delete all r
 1. Go to the AWS CloudFormation page and select the stack you created.
 1. Click the **Actions** button and click **Delete Stack** from the menu that appears.
 
-## Resources
+## Nested Stacks
 
-The following resources will be created as part of the CloudFormation Stack.
+This CloudFormation template uses nested stacks to reference templates used by multiple reference architectures. For details, see the [MathWorks Infrastructure as Code Building Blocks](https://github.com/mathworks-ref-arch/iac-building-blocks) repository.
 
-1. Security Group for SSH and RDP access
-1. EC2 Instance
+----
+
+Copyright 2020-2023 The MathWorks, Inc.
+
+----
