@@ -2,7 +2,7 @@
 
 ## Step 1. Launch the Template
 
-Click the **Launch Stack** button to deploy a standalone MATLAB desktop client on AWS. This will open the CloudFormation Create Stack screen in your web browser.
+Click the **Launch Stack** button to deploy a standalone MATLAB&reg; desktop client on AWS&reg;. This will open the CloudFormation Create Stack screen in your web browser.
 
 | Region | Launch Link |
 | --------------- | ----------- |
@@ -70,7 +70,7 @@ After you click the Launch Stack button above, the “Create stack” page will 
 1. You can also connect using SSH from the terminal using the format: `ssh Administrator@<DNS name>`. *For example*: ssh Administrator@ec2-11-222-33-44.compute-1.amazonaws.com
 
 ## Step 4. Start MATLAB
-Double-click the MATLAB icon on the virtual machine desktop to start MATLAB. The first time you start MATLAB, you need to enter your MathWorks Account credentials to license MATLAB. For other ways to license MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html). 
+Double-click the MATLAB icon on the virtual machine desktop to start MATLAB. The first time you start MATLAB, you need to enter your MathWorks&reg; Account credentials to license MATLAB. For other ways to license MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html). 
 
 >**Note**: It may take up to a minute for MATLAB to start the first time.
 
@@ -96,6 +96,6 @@ This CloudFormation template uses nested stacks to reference templates used by m
 
 ----
 
-Copyright (c) 2020-2023 The MathWorks, Inc. All rights reserved.
+Copyright 2020-2023 The MathWorks, Inc.
 
 ----
