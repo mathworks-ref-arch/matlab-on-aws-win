@@ -2,7 +2,8 @@
 
 ## Step 1. Launch the Template
 
-Click the **Launch Stack** button to deploy a standalone MATLAB&reg; desktop client on AWS&reg;. This will open the CloudFormation Create Stack screen in your web browser.
+Click the **Launch Stack** button to deploy a standalone MATLAB&reg; desktop client on AWS&reg;. This 
+opens the CloudFormation Create Stack screen in your web browser.
 
 | Region | Launch Link |
 | --------------- | ----------- |
@@ -54,6 +55,7 @@ After you click the Launch Stack button above, the “Create stack” page will 
 | **Additional security group to place instances in** | ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
 | **Use Elastic IP address that persists across machine reboots** | Flag indicating whether you want to keep the same public IP address for the instance. |
 | **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours |
+| **Custom AMI ID (Optional)** | ID of a custom Amazon Machine Image (AMI) in the target region (optional). If the build has been customized then the resulting machine image may no longer be compatible with the provided CloudFormation template. Compatability can in some cases be restored by making corresponding modifications to the CloudFormation template. The ID should start with 'ami-'. |
 | **Optional user inline command** | Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: \<[System.Environment]::SetEnvironmentVariable("CLOUD","AWS", "Machine");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: \<Invoke-WebRequest "https://www.example.com/script.ps1" -OutFile script.ps1; .\script.ps1>. Find the logs at '$Env:ProgramData\MathWorks\startup.log'. |
 
 
@@ -96,6 +98,6 @@ This CloudFormation template uses nested stacks to reference templates used by m
 
 ----
 
-Copyright 2020-2023 The MathWorks, Inc.
+Copyright 2020-2024 The MathWorks, Inc.
 
 ----
