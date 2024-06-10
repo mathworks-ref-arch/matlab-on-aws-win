@@ -20,6 +20,9 @@ You need:
 You are responsible for the cost of the AWS services used when you create cloud resources using this guide. Resource settings, such as instance type, affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you will be using. Prices are subject to change.
 
 # Deployment Steps
+By default, the MATLAB reference architectures below launch prebuilt machine images, described in [Architecture and Resources](#architecture-and-resources). Using a prebuilt machine image is the easiest way to deploy a MATLAB reference architecture. Alternatively, to build your own machine image with MATLAB using our build scripts, see [Build and Deploy Your Own Machine Image](#build-and-deploy-your-own-machine-image).
+
+## Deploy Prebuilt Machine Image
 
 To view instructions for deploying the MATLAB reference architecture, select a MATLAB release:
 
@@ -42,6 +45,9 @@ The above instructions allow you to launch instances based on the latest MathWor
 MathWorks periodically replaces older AMIs with new images.
 For more details, see
 [When are the MathWorks Amazon Machine Images updated?](#when-are-the-mathWorks-amazon-machine-images-updated)
+
+## Build and Deploy Your Own Machine Image		
+For details of the scripts which form the basis of the MathWorks Windows AMI build process, see [Build Your Own Machine Image](./packer/v1). You can use these scripts to build your own custom Windows machine image for running MATLAB on Amazon Web Services. You can then deploy this custom image with the MathWorks infrastructure as code (IaC) templates.
 
 ## Learn about Architecture
 

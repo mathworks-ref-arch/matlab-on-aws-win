@@ -1,0 +1,4 @@
+# Shell scripts are run by the Packer build on the remote Linux machine,
+# and so should have LF line endings on checkout.
+*.sh text eol=lf
+*.ps1 text eol=crlf

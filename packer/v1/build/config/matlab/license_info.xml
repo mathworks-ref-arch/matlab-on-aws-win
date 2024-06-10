@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!--Copyright 2022-2024 The MathWorks, Inc.-->
+<root>
+	<ActivationEntry hostname="*" matlabroot="*" user="*">
+	<licmode>online</licmode>
+	</ActivationEntry>
+</root>

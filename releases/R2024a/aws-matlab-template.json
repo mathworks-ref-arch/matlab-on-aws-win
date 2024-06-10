@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-08466f0d2e503cfab"
+        "AMI": "ami-0b44ec9fbe4ac95a6"
       },
       "us-east-2": {
-        "AMI": "ami-0f9701011d7878edd"
+        "AMI": "ami-00aee0ca6436f4a6a"
       },
       "us-west-1": {
-        "AMI": "ami-06d3fe46ab29d3dda"
+        "AMI": "ami-0fbdaf34d6820e80b"
       },
       "us-west-2": {
-        "AMI": "ami-0fe326b7115461fc4"
+        "AMI": "ami-016518fefd9d82d81"
       },
       "ca-central-1": {
-        "AMI": "ami-0bb4893b8fe551a77"
+        "AMI": "ami-01eed72ffe36c484a"
       },
       "eu-central-1": {
-        "AMI": "ami-0fcea1449273c06a5"
+        "AMI": "ami-0c2e7a35faa1f35a4"
       },
       "eu-west-1": {
-        "AMI": "ami-09bf622b2c88bb216"
+        "AMI": "ami-0e69bf149f9652048"
       },
       "eu-west-2": {
-        "AMI": "ami-0cc96622d0ec048e7"
+        "AMI": "ami-0f706d6614740f7f4"
       },
       "eu-west-3": {
-        "AMI": "ami-0679295e02e2acafd"
+        "AMI": "ami-07b785f9feba8da07"
       },
       "eu-north-1": {
-        "AMI": "ami-031eaaada015ae86d"
+        "AMI": "ami-0878e4ad5c8e2fd9d"
       },
       "sa-east-1": {
-        "AMI": "ami-058eba3d4fdfa9287"
+        "AMI": "ami-016a871b2240ca390"
       },
       "me-south-1": {
-        "AMI": "ami-0bba3f4168d13ac1e"
+        "AMI": "ami-0fe63cf6f3886bd93"
       },
       "ap-east-1": {
-        "AMI": "ami-05b51b80ad794cf58"
+        "AMI": "ami-0e6f097ece0047b88"
       },
       "ap-south-1": {
-        "AMI": "ami-0034fc04eb2190828"
+        "AMI": "ami-02860b6ca89f6e34c"
       },
       "ap-northeast-1": {
-        "AMI": "ami-033b71a4b10f1fec2"
+        "AMI": "ami-0e1e350ca52916968"
       },
       "ap-northeast-2": {
-        "AMI": "ami-091dee1e2aff25deb"
+        "AMI": "ami-0877259d1b8a9073a"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0f8c6f80fb27bd59b"
+        "AMI": "ami-0db28339eb0d0dae4"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0304f088a20199f5a"
+        "AMI": "ami-08b1ff1757b456159"
       }
     }
   },
@@ -304,7 +304,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.12",
         "Handler": "index.lambda_handler",
         "Timeout": "600",
         "Code": {
@@ -550,7 +550,7 @@
           }
         },
         "Handler": "index.lambda_handler",
-        "Runtime": "python3.8",
+        "Runtime": "python3.12",
         "Timeout": "60",
         "Role": {
           "Fn::GetAtt": [
