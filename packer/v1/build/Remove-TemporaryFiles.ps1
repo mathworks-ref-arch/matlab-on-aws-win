@@ -13,18 +13,6 @@
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
-function Uninstall-Python {
-    Write-Output 'Removing the Python installation used for executing build tools'
-
-    Write-Output 'Starting Uninstall-Python...'
-
-    wmic product where "Name like 'Python%'" call uninstall /nointeractive
-
-    Remove-Item 'C:\Program Files\Python310' -Force -Recurse
-
-    Write-Output 'Done with Uninstall-Python.'
-}
-
 function Remove-TemporaryBuildFiles {
     Write-Output 'Starting Remove-TemporaryBuildFiles...'
 
@@ -57,7 +45,6 @@ function Clear-TemporaryLogContents {
 
 try {
     $ErrorActionPreference = 'Stop'
-    Uninstall-Python
     Remove-TemporaryBuildFiles
     Clear-TemporaryLogContents
 }

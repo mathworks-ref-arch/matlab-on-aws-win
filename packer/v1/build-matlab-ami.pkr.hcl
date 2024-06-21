@@ -35,6 +35,7 @@ variable "BUILD_SCRIPTS" {
     "Install-StartupScripts.ps1",
     "Install-NVIDIADrivers.ps1",
     "Install-Dependencies.ps1",
+    "Install-MATLABProxy.ps1",
     "Install-MATLAB.ps1",
     "Remove-IE.ps1"
   ]
@@ -50,9 +51,10 @@ variable "STARTUP_SCRIPTS" {
     "20_Set-AdminPassword.ps1",
     "30_Initialize-CloudWatchLogging.ps1",
     "40_Set-DDUX.ps1",
-    "50_Set-MATLABLicense.ps1",
-    "60_Invoke-MATLABStartupAccelerator.ps1",
-    "70_Invoke-MSHStartupAccelerator.ps1",
+    "50_Setup-MATLABProxy.ps1",
+    "60_Set-MATLABLicense.ps1",
+    "70_Invoke-MATLABStartupAccelerator.ps1",
+    "80_Invoke-MSHStartupAccelerator.ps1",
     "99_Invoke-OptionalUserCommand.ps1"
   ]
   description = "The list of startup scripts Packer will copy to the remote machine image builder, which can be used during the CloudFormation Stack creation."
@@ -61,7 +63,9 @@ variable "STARTUP_SCRIPTS" {
 variable "RUNTIME_SCRIPTS" {
   type = list(string)
   default = [
-    "Install-NVIDIAGridDriver.ps1"
+    "Install-NVIDIAGridDriver.ps1",
+    "Start-MATLABProxy.ps1",
+    "generate-certificate.py"
   ]
   description = "The list of runtime scripts Packer will copy to the remote machine image builder, which can be used after the CloudFormation Stack creation."
 }
@@ -161,6 +165,11 @@ variable "AWS_INSTANCE_PROFILE" {
   description = "The AWS instance profile role used during Packer builds."
 }
 
+variable "MATLAB_PROXY_VERSION" {
+  type        = string
+  default     = "0.10.0"
+  description = "The matlab-proxy version to use."
+}
 
 # Set up local variables used by provisioners.
 locals {
@@ -249,7 +258,8 @@ build {
       "NVIDIA_DRIVER_INSTALLER_URL=${var.NVIDIA_DRIVER_INSTALLER_URL}",
       "DCV_INSTALLER_URL=${var.DCV_INSTALLER_URL}",
       "PYTHON_INSTALLER_URL=${var.PYTHON_INSTALLER_URL}",
-      "MATLAB_SOURCE_URL=${var.MATLAB_SOURCE_URL}"
+      "MATLAB_SOURCE_URL=${var.MATLAB_SOURCE_URL}",
+      "MATLAB_PROXY_VERSION=${var.MATLAB_PROXY_VERSION}"
     ]
     scripts = "${local.build_scripts}"
   }

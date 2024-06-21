@@ -12,9 +12,9 @@ STARTUP_SCRIPTS = [
   "20_Set-AdminPassword.ps1",
   "30_Initialize-CloudWatchLogging.ps1",
   "40_Set-DDUX.ps1",
-  "50_Set-MATLABLicense.ps1",
-  "60_Invoke-MATLABStartupAccelerator.ps1",
-  "70_Invoke-MSHStartupAccelerator.ps1",
+  "60_Set-MATLABLicense.ps1",
+  "70_Invoke-MATLABStartupAccelerator.ps1",
+  "80_Invoke-MSHStartupAccelerator.ps1",
   "99_Invoke-OptionalUserCommand.ps1"
 ]
 RUNTIME_SCRIPTS = [

@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-0b44ec9fbe4ac95a6"
+        "AMI": "ami-0b87d6d6549d6cf05"
       },
       "us-east-2": {
-        "AMI": "ami-00aee0ca6436f4a6a"
+        "AMI": "ami-0897405d466f70917"
       },
       "us-west-1": {
-        "AMI": "ami-0fbdaf34d6820e80b"
+        "AMI": "ami-08274e280c8adeb41"
       },
       "us-west-2": {
-        "AMI": "ami-016518fefd9d82d81"
+        "AMI": "ami-0475ad550a49c0b32"
       },
       "ca-central-1": {
-        "AMI": "ami-01eed72ffe36c484a"
+        "AMI": "ami-0c552748a47926287"
       },
       "eu-central-1": {
-        "AMI": "ami-0c2e7a35faa1f35a4"
+        "AMI": "ami-0f0c16d879e0ea850"
       },
       "eu-west-1": {
-        "AMI": "ami-0e69bf149f9652048"
+        "AMI": "ami-09df159ef808ed76e"
       },
       "eu-west-2": {
-        "AMI": "ami-0f706d6614740f7f4"
+        "AMI": "ami-062148e3a494da1dd"
       },
       "eu-west-3": {
-        "AMI": "ami-07b785f9feba8da07"
+        "AMI": "ami-06ff6af6d123de5f9"
       },
       "eu-north-1": {
-        "AMI": "ami-0878e4ad5c8e2fd9d"
+        "AMI": "ami-0acd50010ef1e1164"
       },
       "sa-east-1": {
-        "AMI": "ami-016a871b2240ca390"
+        "AMI": "ami-007af0068115c5ffa"
       },
       "me-south-1": {
-        "AMI": "ami-0fe63cf6f3886bd93"
+        "AMI": "ami-06c7b69755f9cccbd"
       },
       "ap-east-1": {
-        "AMI": "ami-0e6f097ece0047b88"
+        "AMI": "ami-0ce622c442dd13ced"
       },
       "ap-south-1": {
-        "AMI": "ami-02860b6ca89f6e34c"
+        "AMI": "ami-0716f3eb96636ba86"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0e1e350ca52916968"
+        "AMI": "ami-01ec0de36d77714fc"
       },
       "ap-northeast-2": {
-        "AMI": "ami-0877259d1b8a9073a"
+        "AMI": "ami-05fe1d3337c60b150"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0db28339eb0d0dae4"
+        "AMI": "ami-0e99496ad3a69b5d8"
       },
       "ap-southeast-2": {
-        "AMI": "ami-08b1ff1757b456159"
+        "AMI": "ami-0ff3bbab6addc3c87"
       }
     }
   },
@@ -352,7 +352,7 @@
     "MWSecurityGroup": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/security-group/v1/0/0/security-group.yml",
+        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/security-group/v1/1/0/security-group.yml",
         "Parameters": {
           "VpcId": {
             "Ref": "VPC"
@@ -362,7 +362,8 @@
           },
           "SSHAccess": "Yes",
           "RDPAccess": "Yes",
-          "NICEDCVAccess": "Yes"
+          "NICEDCVAccess": "Yes",
+          "MATLABProxyAccess": "Yes"
         }
       }
     },
@@ -488,6 +489,9 @@
                       }
                     }
                   ]
+                },
+                {
+                  "Fn::Sub": "$Env:EnableMATLABProxy='${EnableMATLABProxy}'"
                 },
                 {
                   "Fn::Sub": "$Env:OptionalUserCommand='${OptionalUserCommand}'"
@@ -735,6 +739,15 @@
       "ConstraintDescription": "Must be the name of an existing EC2 KeyPair.",
       "AllowedPattern": ".+"
     },
+    "EnableMATLABProxy": {
+      "Description": "Option that enables access to MATLAB on your cloud MATLAB instance within a browser. Opening MATLAB in a browser opens a separate MATLAB session to your Remote Desktop Protocol (RDP) session or NICE DCV session.",
+      "Default": "Yes",
+      "Type": "String",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ]
+    },
     "ClientIPAddress": {
       "Description": "IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as <ip_address>/<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate.",
       "Type": "String",
@@ -745,7 +758,7 @@
     },
     "Password": {
       "NoEcho": "true",
-      "Description": "Password for the user Administrator",
+      "Description": "Password for the user Administrator. You also need to enter this as an authentication token to access MATLAB on your cloud instance within a browser.",
       "Type": "String",
       "AllowedPattern": "^((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])|(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*])|(?=.*[0-9])(?=.*[A-Z])(?=.*[!@#$%^&*])|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])).{14,72}$",
       "ConstraintDescription": "Your password must contain at least 14 characters, an upper and a lower case character, a digit, and a special character."
@@ -955,6 +968,14 @@
         }
       ]
     },
+    "UseMATLABProxy": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnableMATLABProxy"
+        },
+        "Yes"
+      ]
+    },
     "UseCloudWatch": {
       "Fn::Equals": [
         {
@@ -1025,6 +1046,13 @@
         ]
       }
     },
+    "BrowserConnection": {
+      "Condition": "UseMATLABProxy",
+      "Description": "URL to connect to and open MATLAB in a browser.",
+      "Value": {
+        "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8123"
+      }
+    },
     "CloudWatchLogs": {
       "Condition": "UseCloudWatch",
       "Description": "The cloudwatch logs containing logging information about the MATLAB instance",
@@ -1070,6 +1098,7 @@
           "Parameters": [
             "ClientIPAddress",
             "RDPKeyName",
+            "EnableMATLABProxy",
             "Password",
             "ConfirmPassword"
           ]
@@ -1159,6 +1188,9 @@
         },
         "RDPKeyName": {
           "default": "RDP Key Pair"
+        },
+        "EnableMATLABProxy": {
+          "default": "Enable browser access for MATLAB"
         },
         "LicenseManager": {
           "default": "License Manager for MATLAB connection string"
