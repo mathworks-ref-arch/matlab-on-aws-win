@@ -13,7 +13,7 @@
     Invoke-OptionalUserCommand -UserCommand "<OPTIONAL_USER_COMMAND>"
 
 .NOTES
-    Copyright 2023-2024 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
 #>
 
 function Invoke-OptionalUserCommand {

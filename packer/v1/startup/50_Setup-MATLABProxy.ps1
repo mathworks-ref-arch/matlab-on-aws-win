@@ -18,7 +18,7 @@
     Set-MATLABProxy -EnableBrowserAccess "Yes" -AuthToken "<AUTH-TOKEN>"
 
 .NOTES
-    Copyright 2024 The MathWorks Inc.
+    Copyright 2024 The MathWorks, Inc.
 #>
 
 function Set-MATLABProxy {

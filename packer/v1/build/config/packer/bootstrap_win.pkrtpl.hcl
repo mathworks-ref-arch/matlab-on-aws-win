@@ -1,4 +1,6 @@
 <powershell>
+# Copyright 2024 The MathWorks, Inc.
+#
 # This script is executed by Packer during deployment of the build instance.
 # It enables WinRM, which Packer uses to provision the instance.
 

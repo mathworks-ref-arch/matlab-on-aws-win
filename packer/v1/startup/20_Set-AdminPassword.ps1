@@ -12,7 +12,7 @@
     Set-AdminPassword -AdminPass "<ADMIN_PASSWORD>"
 
 .NOTES
-    Copyright 2023 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
 #>
 function Set-AdminPassword {
 

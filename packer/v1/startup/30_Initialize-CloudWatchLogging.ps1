@@ -16,7 +16,7 @@
     https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-cloudwatch-agent-configuration-file.html
 
 .NOTES
-    Copyright 2023 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
 #>
 
 function Initialize-CloudWatchLogging {

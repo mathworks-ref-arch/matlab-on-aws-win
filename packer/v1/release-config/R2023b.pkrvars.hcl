@@ -1,4 +1,4 @@
-# Copyright 2024 The MathWorks Inc.
+# Copyright 2024 The MathWorks, Inc.
 
 // Use this Packer configuration file to build AMI with R2023b MATLAB installed.
 // For more information on these variables, see /packer/build-matlab-ami.pkr.hcl.

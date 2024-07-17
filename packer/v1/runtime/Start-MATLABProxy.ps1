@@ -12,7 +12,7 @@
     https://github.com/mathworks/matlab-proxy/blob/main/Advanced-Usage.md
 
 .NOTES
-    Copyright 2024 The MathWorks Inc.
+    Copyright 2024 The MathWorks, Inc.
     This script is invoked by Task Scheduler only.
 #>
 function Start-MATLABProxy {

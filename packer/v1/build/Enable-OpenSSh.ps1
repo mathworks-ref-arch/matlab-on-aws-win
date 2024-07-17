@@ -12,7 +12,7 @@
     https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse
 
 .NOTES
-    Copyright 2023 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 

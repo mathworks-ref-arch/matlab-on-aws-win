@@ -13,7 +13,7 @@
     https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-using-volumes.html
 
 .NOTES
-    Copyright 2023 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
 #>
 function Initialize-EBSVolume {
 

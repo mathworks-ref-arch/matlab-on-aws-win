@@ -12,7 +12,7 @@
     Invoke-MATLABStartupAccelerator -MATLABRoot "<MATLAB_ROOT_FOLDER>"
 
 .NOTES
-    Copyright 2020-2024 The MathWorks Inc.
+    Copyright 2020-2024 The MathWorks, Inc.
 #>
 
 function Invoke-MATLABStartupAccelerator {

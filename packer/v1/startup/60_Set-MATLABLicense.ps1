@@ -15,7 +15,7 @@
     Set-MATLABLicense -MATLABRoot "<MATLAB_ROOT_FOLDER>" -MLMLicenseFile "<PATH_TO_MATLAB_LICENSE_FILE>"
 
 .NOTES
-    Copyright 2023 The MathWorks Inc.
+    Copyright 2023-2024 The MathWorks, Inc.
 #>
 
 function Set-MATLABLicense {

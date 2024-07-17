@@ -12,7 +12,7 @@
     Invoke-MSHStartupAccelerator -MATLABRoot "<MATLAB_ROOT_FOLDER>"
 
 .NOTES
-    Copyright 2024 The MathWorks Inc.
+    Copyright 2024 The MathWorks, Inc.
 #>
 
 function Invoke-MSHStartupAccelerator {
