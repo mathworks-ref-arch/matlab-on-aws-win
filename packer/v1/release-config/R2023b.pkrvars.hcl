@@ -4,7 +4,7 @@
 // For more information on these variables, see /packer/build-matlab-ami.pkr.hcl.
 RELEASE  = "R2023b"
 // Microsoft Windows Server 2022 Base (64-bit (x86))
-BASE_AMI = "ami-0f9c44e98edf38a2b"
+BASE_AMI_NAME = "Windows_Server-2022-English-Full-Base-*"
 STARTUP_SCRIPTS = [
   "env.ps1",
   "00_Confirm-InstanceProfile.ps1",

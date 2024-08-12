@@ -20,7 +20,8 @@ function Confirm-InstanceProfile {
     $Response = $null
     while ($StatusCode -ne 200) {
         try {
-            $Response = Invoke-WebRequest -UseBasicParsing -Uri http://169.254.169.254/latest/meta-data/iam/info
+            $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "120"} -Method PUT -Uri http://169.254.169.254/latest/api/token
+            $Response = Invoke-WebRequest -UseBasicParsing -Uri http://169.254.169.254/latest/meta-data/iam/info -Headers @{ "X-aws-ec2-metadata-token" = $Token }
             $StatusCode = $Response.StatusCode
             Start-Sleep -Milliseconds 100
         }

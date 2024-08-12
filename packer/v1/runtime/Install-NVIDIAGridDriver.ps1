@@ -31,7 +31,8 @@ function Install-NVidiaGridDrivers {
     Start-Transcript -Path 'C:\Windows\NVIDIADrivers\grid-drivers-installation.log'
 
     # Invoke instance meta-data service to retrieve the instance type of the running VM
-    $InstanceType = $(Invoke-WebRequest -UseBasicParsing -Uri http://169.254.169.254/latest/meta-data/instance-type).Content
+    $Token = $(Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "120"} -Method PUT -Uri http://169.254.169.254/latest/api/token)
+    $InstanceType = $(Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-type)
 
     # Extract class from the instance type
     $InstanceClass = $InstanceType.Split('.')[0]

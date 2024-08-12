@@ -4,7 +4,7 @@
 // For more information on these variables, see /packer/build-matlab-ami.pkr.hcl.
 RELEASE  = "R2023a"
 // Microsoft Windows Server 2022 Base (64-bit (x86))
-BASE_AMI = "ami-0f9c44e98edf38a2b"
+BASE_AMI_NAME = "Windows_Server-2022-English-Full-Base-*"
 STARTUP_SCRIPTS = [
   "env.ps1",
   "00_Confirm-InstanceProfile.ps1",
@@ -12,18 +12,22 @@ STARTUP_SCRIPTS = [
   "20_Set-AdminPassword.ps1",
   "30_Initialize-CloudWatchLogging.ps1",
   "40_Set-DDUX.ps1",
+  "50_Setup-MATLABProxy.ps1",
   "60_Set-MATLABLicense.ps1",
   "70_Invoke-MATLABStartupAccelerator.ps1",
   "80_Invoke-MSHStartupAccelerator.ps1",
   "99_Invoke-OptionalUserCommand.ps1"
 ]
 RUNTIME_SCRIPTS = [
-  "Install-NVIDIAGridDriver.ps1"
+  "Install-NVIDIAGridDriver.ps1",
+  "Start-MATLABProxy.ps1",
+  "generate-certificate.py"
 ]
 BUILD_SCRIPTS = [
   "Install-StartupScripts.ps1",
   "Install-NVIDIADrivers.ps1",
   "Install-Dependencies.ps1",
+  "Install-MATLABProxy.ps1",
   "Install-MATLAB.ps1",
   "Remove-IE.ps1"
 ]
@@ -31,3 +35,4 @@ PRODUCTS                    = "5G_Toolbox AUTOSAR_Blockset Aerospace_Blockset Ae
 DCV_INSTALLER_URL           = "https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi"
 NVIDIA_DRIVER_INSTALLER_URL = "https://uk.download.nvidia.com/tesla/518.03/518.03-data-center-tesla-desktop-winserver-2016-2019-2022-dch-international.exe"
 PYTHON_INSTALLER_URL        = "https://www.python.org/ftp/python/3.10.5/python-3.10.5-amd64.exe"
+MATLAB_PROXY_VERSION        = "0.10.0"

@@ -18,15 +18,10 @@ variable "PRODUCTS" {
 
 }
 
-variable "BASE_AMI" {
+variable "BASE_AMI_NAME" {
   type        = string
-  default     = "ami-0f9c44e98edf38a2b"
-  description = "Default AMI ID refers to the Windows Server 2022 image provided by Microsoft."
-
-  validation {
-    condition     = can(regex("^ami-", var.BASE_AMI))
-    error_message = "The BASE_AMI must start with \"ami-\"."
-  }
+  default     = "Windows_Server-2022-English-Full-Base-*"
+  description = "Default AMI name refers to the Windows Server 2022 image provided by Microsoft."
 }
 
 variable "BUILD_SCRIPTS" {
@@ -133,6 +128,8 @@ variable "AMI_TAGS" {
     Build    = "MATLAB"
     Type     = "matlab-on-aws"
     Platform = "Windows"
+    Base_AMI_ID = "{{ .SourceAMI }}"
+    Base_AMI_Name = "{{ .SourceAMIName }}"
   }
   description = "The tags Packer adds to the resultant machine image."
 }
@@ -197,7 +194,15 @@ source "amazon-ebs" "AMI_Builder" {
     volume_type           = "gp2"
   }
   region                                    = "us-east-1"
-  source_ami                                = "${var.BASE_AMI}"
+  source_ami_filter {
+    filters = {
+      "virtualization-type" = "hvm"
+      "name" = "${var.BASE_AMI_NAME}"
+      "root-device-type" = "ebs"
+    } 
+    owners = ["801119661308"] # Owner ID associated with Windows Server AMIs
+    most_recent = true
+  }
   subnet_id                                 = "${var.SUBNET_ID}"
   run_tags                                  = "${var.INSTANCE_TAGS}"
   tags                                      = "${var.AMI_TAGS}"
@@ -282,6 +287,8 @@ build {
       release            = "MATLAB ${var.RELEASE}"
       specified_products = "${var.PRODUCTS}"
       build_scripts      = join(", ", "${var.BUILD_SCRIPTS}")
+      base_ami_id        = "{{ .SourceAMI }}"
+      base_ami_name      = "{{ .SourceAMIName }}"
     }
   }
 }

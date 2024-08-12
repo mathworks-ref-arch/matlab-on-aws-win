@@ -20,8 +20,10 @@ function Set-DDUX {
     [Environment]::SetEnvironmentVariable('MW_CONTEXT_TAGS', 'MATLAB:AWS:V1', [System.EnvironmentVariableTarget]::Machine)
     [Environment]::SetEnvironmentVariable('MW_DDUX_FORCE_ENABLE', $true, [System.EnvironmentVariableTarget]::Machine)
 
-    $ResponseInstanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id
-    $ResponseRegion = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/placement/region
+    $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "120"} -Method PUT -Uri http://169.254.169.254/latest/api/token
+    $ResponseInstanceId = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
+    $ResponseRegion = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/placement/region
+    
     $MWAppTagGroup = aws ec2 describe-tags --filters "Name=resource-id,Values=$ResponseInstanceId" 'Name=key,Values=mw-app' --region "$ResponseRegion"
     $MWAppTag = (Write-Output $MWAppTagGroup | ConvertFrom-Json).Tags.Value
 
