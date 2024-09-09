@@ -43,15 +43,15 @@ function Install-MATLABUsingMPM {
                 --products $ProductsList
         }
         else {
-            aws s3 cp $SourceURL matlab.zip
-            Expand-Archive -LiteralPath matlab.zip -DestinationPath $Env:TEMP\matlab_source -Force
-            Remove-Item -Path matlab.zip
+            aws s3 cp $SourceURL "$Env:TEMP\matlab.zip"
+            Expand-Archive -Path "$Env:TEMP\matlab.zip" -DestinationPath $Env:TEMP\matlab_source -Force
+            Remove-Item -Path "$Env:TEMP\matlab.zip"
 
             & "$Env:TEMP\mpm.exe" install `
                 --source=$Env:TEMP\matlab_source\dvd\archives `
                 --products $ProductsList
 
-            Remove-Item -Path $Env:TEMP\matlab_source -Recurse -Force
+            Remove-Item -Path "$Env:TEMP\matlab_source" -Recurse -Force
         }
     }
     catch {
