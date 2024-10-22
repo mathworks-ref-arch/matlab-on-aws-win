@@ -29,6 +29,13 @@ git clone https://github.com/mathworks-ref-arch/matlab-on-aws-win.git
 cd matlab-on-aws-win\\packer\\v1
 ```
 
+Initialize Packer to install the required plugins.
+You only need to do this once.
+For more information, see [init command reference (Packer)](https://developer.hashicorp.com/packer/docs/commands/init).
+```bash
+packer init build-matlab-ami.pkr.hcl
+```
+
 Launch the Packer build with the default settings.
 Set the `PACKER_ADMIN_PASSWORD` as a command line parameter.
 ```bash

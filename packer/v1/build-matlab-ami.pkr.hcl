@@ -1,5 +1,14 @@
 # Copyright 2024 The MathWorks, Inc.
 
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.3.2"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
 # The following variables may have different value across releases and 
 # it is recommended to modify them via the release-specific configuration file.
 # To learn the release-specific values, visit the configuration file
@@ -97,6 +106,12 @@ variable "MATLAB_SOURCE_URL" {
   type        = string
   default     = ""
   description = "Optional URL from which to download a MATLAB and toolbox source file, for use with the mpm --source option."
+}
+
+variable "SPKG_SOURCE_URL" {
+  type        = string
+  default     = ""
+  description = "Optional URL from which to download MATLAB Support packages source file, for use with the mpm --source option."
 }
 
 # The following variables share the same setup across all MATLAB releases.
@@ -275,6 +290,7 @@ build {
       "DCV_INSTALLER_URL=${var.DCV_INSTALLER_URL}",
       "PYTHON_INSTALLER_URL=${var.PYTHON_INSTALLER_URL}",
       "MATLAB_SOURCE_URL=${var.MATLAB_SOURCE_URL}",
+      "SPKG_SOURCE_URL=${var.SPKG_SOURCE_URL}",
       "MATLAB_PROXY_VERSION=${var.MATLAB_PROXY_VERSION}"
     ]
     scripts = "${local.build_scripts}"

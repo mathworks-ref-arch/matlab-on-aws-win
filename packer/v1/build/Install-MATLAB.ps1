@@ -51,6 +51,8 @@ function Install-MATLABUsingMPM {
                 --source=$Env:TEMP\matlab_source\dvd\archives `
                 --products $ProductsList
 
+            # Save MATLAB VersionInfo file to use with SPKG installation later
+            Copy-Item -Path "$Env:TEMP\matlab_source\dvd\VersionInfo.xml" -Destination "$Env:ProgramData\MathWorks"
             Remove-Item -Path "$Env:TEMP\matlab_source" -Recurse -Force
         }
     }

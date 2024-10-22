@@ -18,7 +18,10 @@ function Install-MATLABSPKGUsingMPM {
         [string] $Release,
 
         [Parameter(Mandatory = $true)]
-        [string] $Products
+        [string] $Products,
+
+        [Parameter(Mandatory = $false)]
+        [string] $SourceURL
     )
 
     Write-Output 'Starting Install-MATLABSPKGUsingMPM...'
@@ -34,9 +37,23 @@ function Install-MATLABSPKGUsingMPM {
     $ProductsList = $Products -Split ' '
 
     try {
-        & "$Env:TEMP\mpm.exe" install `
-            --release $Release `
-            --products $ProductsList
+        if ( $SourceURL.length -eq 0 ) {
+            & "$Env:TEMP\mpm.exe" install `
+                --release $Release `
+                --products $ProductsList
+        }
+        else {
+            aws s3 cp $SourceURL "$Env:TEMP\spkg.zip"
+            Expand-Archive -Path "$Env:TEMP\spkg.zip" -DestinationPath $Env:TEMP\spkg_source -Force
+            Move-Item -Path "$Env:ProgramData\MathWorks\VersionInfo.xml" -Destination "$Env:TEMP\spkg_source"
+            Remove-Item -Path "$Env:TEMP\spkg.zip"
+
+            & "$Env:TEMP\mpm.exe" install `
+                --source=$Env:TEMP\spkg_source\archives `
+                --products $ProductsList
+
+            Remove-Item -Path $Env:TEMP\spkg_source -Recurse -Force
+        }
     }
     catch {
         if (Test-Path $MpmLogFilePath) {
@@ -63,9 +80,12 @@ function Install-MATLABSupportPackages {
         [string] $Release,
 
         [Parameter(Mandatory = $true)]
-        [string] $Products
+        [string] $Products,
+
+        [Parameter(Mandatory = $false)]
+        [string] $SourceURL
     )
-    Install-MATLABSPKGUsingMPM -Release $Release -Products $Products
+    Install-MATLABSPKGUsingMPM -Release $Release -Products $Products -SourceURL $SourceURL
 }
 
 
@@ -77,7 +97,7 @@ try {
         exit 0
     }
 
-    Install-MATLABSupportPackages -Release $Env:RELEASE -Products $Env:SPKGS
+    Install-MATLABSupportPackages -Release $Env:RELEASE -Products $Env:SPKGS -SourceURL $Env:SPKG_SOURCE_URL
 }
 catch {
     $ScriptPath = $MyInvocation.MyCommand.Path
