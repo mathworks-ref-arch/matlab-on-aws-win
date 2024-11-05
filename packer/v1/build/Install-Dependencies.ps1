@@ -60,7 +60,7 @@ function Get-NVidiaGridDrivers {
     Write-Output 'Starting Get-NVidiaGridDrivers ...'
 
     $Bucket = 'ec2-windows-nvidia-drivers'
-    $KeyPrefix = 'grid-17.3'
+    $KeyPrefix = 'grid-16.7'
     $LocalPath = 'C:\Windows\NVIDIADrivers\'
 
     # Create a new folder to store scripts and installers related to NVIDIA GRID drivers

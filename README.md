@@ -50,6 +50,8 @@ For more details, see
 ## Build and Deploy Your Own Machine Image		
 For details of the scripts which form the basis of the MathWorks Windows AMI build process, see [Build Your Own Machine Image](./packer/v1). You can use these scripts to build your own custom Windows machine image for running MATLAB on Amazon Web Services. You can then deploy this custom image with the MathWorks infrastructure as code (IaC) templates.
 
+Platform engineering teams can use these scripts to take advantage of optimizations MathWorks has developed for running MathWorks products in the cloud. For more details, see [What are the advantages of building images with MathWorks scripts?](#what-are-the-advantages-of-building-images-with-mathworks-scripts)
+
 ## Learn about Architecture
 
 ![MATLAB on AWS Reference Architecture](img/aws-matlab-diagram.png)
@@ -101,7 +103,7 @@ All your files and changes are stored locally on the virtual machine. They persi
 To minimize costs, you might want to shut down the instance when you are not using it. When the virtual machine is stopped, you are only charged for storage. To shut down an EC2 instance, locate it in the AWS web console, select the instance and choose “Instance State/Stop” from the “Actions” menu. You can restart it from the same menu. Any files or changes you make to the virtual machine will persist when you shut it down and will be present when you restart it. Shutting down the virtual machine and restarting it might change the public IP address and DNS name.  Inspecting the EC2 instance in the AWS console will reveal the new IP address and DNS name.
 
 ### How do I keep the same public IP address?
-To avoid having to change the IP address between restarts, enable the **Keep public IP address the same** option during deployment. For more information, see (Elastic IP addresses)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html].
+To avoid having to change the IP address between restarts, enable the **Keep public IP address the same** option during deployment. For more information, see [Elastic IP addresses](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html).
 
 ### How do I manage my EC2 quotas?
 See [Amazon EC2 Service Quotas](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html).
@@ -123,6 +125,15 @@ You can customize a prebuilt AMI by launching the reference architecture, applyi
 
 ### How do I use a different license manager?
 The AMI uses MathWorks Hosted License Manager by default. For information on how to use other license managers, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/licensingoncloud/matlab-on-the-cloud.html).
+
+### What are the advantages of building images with MathWorks scripts?
+Images built with MathWorks scripts are optimized and tested for MathWorks workflows. The images are deployed by MathWorks CloudFormation templates following AWS best practices.
+
+The startup accelerator scripts found in [startup](./packer/v1/startup) allow you to start MATLAB faster. The CloudFormation template uses these scripts to automatically initialize MathWorks files on the instance. This allows MATLAB to be responsive in as little as a minute after you start it. These scripts are automatically included in both the prebuilt images and the images that you build using the instructions in [Deployment Steps](#deployment-steps).
+
+Without the optimization scripts, starting a large software application, such as MATLAB, for the first time can potentially take tens of minutes. Subsequent starts of the large software application will be faster. This is because AWS initializes the storage for the EC2 instance, as described in [Initialize Amazon EBS volumes](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-initialize.html).
+
+Other scripts in this repo also enable options for connecting to the instance, ensure that all the necessary MATLAB dependencies are installed, and make it easy to build an image with an older MATLAB release.
 
 # Technical Support
 To request assistance or additional features, contact [MathWorks Technical Support](https://www.mathworks.com/support/contact_us.html).

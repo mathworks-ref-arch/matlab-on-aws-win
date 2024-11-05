@@ -53,7 +53,7 @@ function Install-NVidiaGridDrivers {
 
     if ($AllowedClasses.Contains($InstanceClass)) {
         Write-Output "Installing GRID Drivers...`n`n"
-        $InstallerPath = 'C:\Windows\NVIDIADrivers\grid-17.3'
+        $InstallerPath = 'C:\Windows\NVIDIADrivers\grid-16.7'
         $SetupFile = $(Get-ChildItem -Path $InstallerPath -Filter "*server$VersionNumber*").Name
         Write-Output "Using setup file $SetupFile present under $InstallerPath `n`n"
         Start-Process "$InstallerPath\$SetupFile" -ArgumentList "-s -n -log:`"C:\Windows\NVIDIADrivers\logs`" -loglevel:6" -Wait -NoNewWindow

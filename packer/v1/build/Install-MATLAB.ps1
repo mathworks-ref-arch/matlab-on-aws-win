@@ -36,20 +36,25 @@ function Install-MATLABUsingMPM {
     Write-Output 'Installing products ...'
     $ProductsList = $Products -Split ' '
 
+    # Determine if --doc flag should be added
+    $UseDocFlag = $Release -in @('R2022b', 'R2022a')
+    $DocFlag = if ($UseDocFlag) { "--doc" } else { "" }
+
     try {
         if ( $SourceURL.length -eq 0 ) {
             & "$Env:TEMP\mpm.exe" install `
                 --release $Release `
-                --products $ProductsList
+                --products $ProductsList `
+                $DocFlag
         }
         else {
             aws s3 cp $SourceURL "$Env:TEMP\matlab.zip"
             Expand-Archive -Path "$Env:TEMP\matlab.zip" -DestinationPath $Env:TEMP\matlab_source -Force
             Remove-Item -Path "$Env:TEMP\matlab.zip"
-
             & "$Env:TEMP\mpm.exe" install `
                 --source=$Env:TEMP\matlab_source\dvd\archives `
-                --products $ProductsList
+                --products $ProductsList `
+                $DocFlag
 
             # Save MATLAB VersionInfo file to use with SPKG installation later
             Copy-Item -Path "$Env:TEMP\matlab_source\dvd\VersionInfo.xml" -Destination "$Env:ProgramData\MathWorks"

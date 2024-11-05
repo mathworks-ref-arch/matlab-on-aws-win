@@ -47,8 +47,9 @@ After you click the Launch Stack button above, the “Create stack” page will 
 | **VPC to deploy this stack to** | ID of an existing VPC in which to deploy this stack |
 | **Subnet** | ID of an existing subnet |
 | **RDP Key Pair** | Name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
+| **Enable browser access for MATLAB** | Option that enables access to MATLAB on your cloud MATLAB instance within a browser. Opening MATLAB in a browser opens a separate MATLAB session to your Remote Desktop Protocol (RDP) session or NICE DCV session. |
 | **Allow RDP and SSH connections from** | IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
-| **Remote password** | Password for the user Administrator |
+| **Remote password** | Password for the user Administrator. You also need to enter this as an authentication token to access MATLAB on your cloud instance within a browser. |
 | **Confirm remote password** | Confirm Password |
 | **License Manager for MATLAB connection string** | Optional License Manager for MATLAB, specified as a string in the form \<port>@\<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws. |
 | **Configure cloudwatch logging for the MATLAB instance** | Flag indicating whether cloudwatch logging for the MATLAB instance is enabled. |
@@ -65,14 +66,21 @@ After you click the Launch Stack button above, the “Create stack” page will 
 
 ## Step 3. Connect to the Virtual Machine in the Cloud
 
+To connect to the Virtual Machine (VM) using Remote Desktop Client, follow these steps:
 1. Expand the **Outputs** section in the *Stack Detail* page.
 1. Look for the key named `RDPSSHConnection` and copy the corresponding public DNS name listed under value. *For example*: ec2-11-222-33-44.compute-1.amazonaws.com
 1. Launch any remote desktop client, paste the public DNS name in the appropriate field, and connect. On the Windows Remote Desktop Client you need to paste the public DNS name in the **Computer** field and click **Connect**.
 1. In the login screen that's displayed, use the username `Administrator` and the password you specified while setting up the stack in [Step 2](#step-2-configure-the-stack).
 1. You can also connect using SSH from the terminal using the format: `ssh Administrator@<DNS name>`. *For example*: ssh Administrator@ec2-11-222-33-44.compute-1.amazonaws.com
 
+If you choose to enable browser access for MATLAB, then:
+1. Expand the **Outputs** section in the *Stack Details* page.
+1. Look for the key named `BrowserConnection` and click on it
+1. On the login screen, use the password you specified while deploying the stack in [Step 2](#step-2-configure-the-stack) as the 'auth token' to authenticate.
+1. Browser access for MATLAB is enabled using `matlab-proxy`, a MathWorks&reg; developed Python&reg; package. For more information on `matlab-proxy`, refer to [matlab-proxy GitHub repository](https://github.com/mathworks/matlab-proxy).
+
 ## Step 4. Start MATLAB
-Double-click the MATLAB icon on the virtual machine desktop to start MATLAB. The first time you start MATLAB, you need to enter your MathWorks&reg; Account credentials to license MATLAB. For other ways to license MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html). 
+Double-click the MATLAB icon on the virtual machine desktop to start MATLAB. The first time you start MATLAB, you need to enter your MathWorks Account credentials to license MATLAB. For other ways to license MATLAB, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html). 
 
 >**Note**: It may take up to a minute for MATLAB to start the first time.
 
