@@ -3,65 +3,65 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-0665539b43cc5ad17"
+        "AMI": "ami-061bb2b5abe6924a2"
       },
       "us-east-2": {
-        "AMI": "ami-0702ba6a58743e250"
+        "AMI": "ami-0281ae99e8b13e3a2"
       },
       "us-west-1": {
-        "AMI": "ami-021695f44d5ca3694"
+        "AMI": "ami-0368b9e711b0dacdb"
       },
       "us-west-2": {
-        "AMI": "ami-08f58c69bad149920"
+        "AMI": "ami-01447a33194fdc3b6"
       },
       "ca-central-1": {
-        "AMI": "ami-07a22d5062ce4c754"
+        "AMI": "ami-0f94d6a65f5264ccd"
       },
       "eu-central-1": {
-        "AMI": "ami-0722484ed7125ec85"
+        "AMI": "ami-045f81fcd7b755204"
       },
       "eu-west-1": {
-        "AMI": "ami-0b1bdce9d525977ec"
+        "AMI": "ami-0f22fbb5153b8fd43"
       },
       "eu-west-2": {
-        "AMI": "ami-03091c3e5e287673b"
+        "AMI": "ami-0e1c1836f5854ba89"
       },
       "eu-west-3": {
-        "AMI": "ami-0b2c0a121255201d9"
+        "AMI": "ami-03679d8265ed6b50e"
       },
       "eu-north-1": {
-        "AMI": "ami-0e39af334f20afed7"
+        "AMI": "ami-0629940491e1c4ace"
       },
       "sa-east-1": {
-        "AMI": "ami-0c9c81fa3c34a07c4"
+        "AMI": "ami-0d669828f6cb2415d"
       },
       "me-south-1": {
-        "AMI": "ami-0f7ac6f5991674c72"
+        "AMI": "ami-0d0724cbb6f6db59a"
       },
       "ap-east-1": {
-        "AMI": "ami-0c3fab8249e8b8e37"
+        "AMI": "ami-0e5914d8dea65644a"
       },
       "ap-south-1": {
-        "AMI": "ami-03e39faf864d4a1c8"
+        "AMI": "ami-063bb05b10dc5e20b"
       },
       "ap-northeast-1": {
-        "AMI": "ami-00375d3f8d03a5788"
+        "AMI": "ami-0fbb59c8ffe2d1c40"
       },
       "ap-northeast-2": {
-        "AMI": "ami-0a81f23c435db4825"
+        "AMI": "ami-0bed460c8c17fec19"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0195a5b6f314cba6c"
+        "AMI": "ami-0d07e43c33a3516b1"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0e38450b355916bf7"
+        "AMI": "ami-00e65b1bc4f88ceb6"
       }
     }
   },
   "Resources": {
     "PredefinedRole": {
       "Type": "AWS::IAM::Role",
-      "Condition": "UsePredefinedRole",
+      "Condition": "CreateNewRole",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -69,13 +69,15 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": "ec2.amazonaws.com"
+                "Service": {
+                  "Fn::Sub": "ec2.${AWS::URLSuffix}"
+                }
               },
               "Action": "sts:AssumeRole"
             }
           ]
         },
-        "Path": "/",
+        "Path": "/MW/",
         "ManagedPolicyArns": {
           "Fn::If": [
             "UseAdditionalPolicies",
@@ -109,17 +111,7 @@
                         "logs:PutLogEvents"
                       ],
                       "Resource": {
-                        "Fn::Sub": [
-                          "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${name}:*",
-                          {
-                            "name": {
-                              "Fn::GetAtt": [
-                                "MWLogLocation",
-                                "Outputs.LogGroupName"
-                              ]
-                            }
-                          }
-                        ]
+                        "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MWLogLocation.Outputs.LogGroupName}:*"
                       }
                     }
                   ]
@@ -139,7 +131,7 @@
                   "Effect": "Allow",
                   "Action": "s3:GetObject",
                   "Resource": {
-                    "Fn::Sub": "arn:aws:s3:::dcv-license.${AWS::Region}/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::dcv-license.${AWS::Region}/*"
                   }
                 }
               ]
@@ -221,13 +213,15 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": "lambda.amazonaws.com"
+                "Service": {
+                  "Fn::Sub": "lambda.${AWS::URLSuffix}"
+                }
               },
               "Action": "sts:AssumeRole"
             }
           ]
         },
-        "Path": "/",
+        "Path": "/MW/",
         "Policies": [
           {
             "PolicyName": "attachprofile-policy",
@@ -238,7 +232,7 @@
                   "Effect": "Allow",
                   "Action": "cloudformation:DescribeStackResource",
                   "Resource": {
-                    "Fn::Sub": "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
                   }
                 },
                 {
@@ -246,11 +240,11 @@
                   "Action": "iam:PassRole",
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:aws:iam::${AWS::AccountId}:role/${role}",
+                      "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/MW/${role}",
                       {
                         "role": {
                           "Fn::If": [
-                            "UsePredefinedRole",
+                            "CreateNewRole",
                             {
                               "Ref": "PredefinedRole"
                             },
@@ -267,14 +261,14 @@
                   "Effect": "Allow",
                   "Action": "ec2:AssociateIamInstanceProfile",
                   "Resource": {
-                    "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
                   },
                   "Condition": {
                     "StringEquals": {
-                      "aws:ResourceTag/aws:cloudformation:stack-name": {
+                      "aws:ResourceTag/mw-ProductID": "MathWorks-MATLAB-Windows",
+                      "aws:ResourceTag/mw-StackName": {
                         "Ref": "AWS::StackName"
-                      },
-                      "aws:ResourceTag/aws:cloudformation:logical-id": "MATLABEC2Instance"
+                      }
                     }
                   }
                 },
@@ -286,7 +280,7 @@
                     "logs:PutLogEvents"
                   ],
                   "Resource": {
-                    "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*AttachInstanceProfileLambda*"
                   }
                 }
               ]
@@ -333,11 +327,11 @@
     "MATLABInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
-        "Path": "/",
+        "Path": "/MW/",
         "Roles": [
           {
             "Fn::If": [
-              "UsePredefinedRole",
+              "CreateNewRole",
               {
                 "Ref": "PredefinedRole"
               },
@@ -351,13 +345,15 @@
     },
     "MWSecurityGroup": {
       "Type": "AWS::CloudFormation::Stack",
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete",
       "Properties": {
-        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/security-group/v1/1/0/security-group.yml",
+        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/security-group/v2/0/0/security-group.yml",
         "Parameters": {
           "VpcId": {
             "Ref": "VPC"
           },
-          "CidrIp": {
+          "CidrRanges": {
             "Ref": "ClientIPAddress"
           },
           "SSHAccess": "Yes",
@@ -369,6 +365,8 @@
     },
     "MWLogLocation": {
       "Type": "AWS::CloudFormation::Stack",
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete",
       "Condition": "UseCloudWatch",
       "Properties": {
         "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/log-location/v1/0/0/log-location.yml"
@@ -438,6 +436,16 @@
             "Key": "Name",
             "Value": {
               "Ref": "InstanceName"
+            }
+          },
+          {
+            "Key": "mw-ProductID",
+            "Value": "MathWorks-MATLAB-Windows"
+          },
+          {
+            "Key": "mw-StackName",
+            "Value": {
+              "Ref": "AWS::StackName"
             }
           }
         ],
@@ -557,10 +565,7 @@
         "Runtime": "python3.12",
         "Timeout": "60",
         "Role": {
-          "Fn::GetAtt": [
-            "AutoShutdownLambdaRole",
-            "Arn"
-          ]
+          "Fn::Sub": "${AutoShutdownLambdaRole.Arn}"
         }
       }
     },
@@ -573,13 +578,15 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": "lambda.amazonaws.com"
+                "Service": {
+                  "Fn::Sub": "lambda.${AWS::URLSuffix}"
+                }
               },
               "Action": "sts:AssumeRole"
             }
           ]
         },
-        "Path": "/",
+        "Path": "/MW/",
         "Policies": [
           {
             "PolicyName": "autoshutdown-policy",
@@ -598,28 +605,22 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": "ec2:Stopinstances",
+                  "Action": [
+                    "ec2:Stopinstances",
+                    "ec2:CreateTags",
+                    "ec2:DeleteTags"
+                  ],
                   "Resource": {
-                    "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
                   },
                   "Condition": {
                     "StringEquals": {
-                      "aws:ResourceTag/aws:cloudformation:stack-name": {
+                      "aws:ResourceTag/mw-ProductID": "MathWorks-MATLAB-Windows",
+                      "aws:ResourceTag/mw-StackName": {
                         "Ref": "AWS::StackName"
-                      },
-                      "aws:ResourceTag/aws:cloudformation:logical-id": "MATLABEC2Instance"
+                      }
                     }
                   }
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:CreateTags",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:DeleteTags",
-                  "Resource": "*"
                 },
                 {
                   "Effect": "Allow",
@@ -629,7 +630,7 @@
                     "logs:PutLogEvents"
                   ],
                   "Resource": {
-                    "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*AutoShutdownLambda*"
                   }
                 }
               ]
@@ -647,10 +648,7 @@
         "Targets": [
           {
             "Arn": {
-              "Fn::GetAtt": [
-                "AutoShutdownLambda",
-                "Arn"
-              ]
+              "Fn::Sub": "${AutoShutdownLambda.Arn}"
             },
             "Id": "TargetFunctionV1"
           }
@@ -664,28 +662,21 @@
           "Ref": "AutoShutdownLambda"
         },
         "Action": "lambda:InvokeFunction",
-        "Principal": "events.amazonaws.com",
+        "Principal": {
+          "Fn::Sub": "events.${AWS::URLSuffix}"
+        },
         "SourceArn": {
-          "Fn::GetAtt": [
-            "AutoShutdownScheduledRule",
-            "Arn"
-          ]
+          "Fn::Sub": "${AutoShutdownScheduledRule.Arn}"
         }
       }
     },
     "AutoShutdownLambdaLogGroup": {
       "Type": "AWS::Logs::LogGroup",
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete",
       "Properties": {
         "LogGroupName": {
-          "Fn::Join": [
-            "",
-            [
-              "/aws/lambda/",
-              {
-                "Ref": "AutoShutdownLambda"
-              }
-            ]
-          ]
+          "Fn::Sub": "/aws/lambda/${AutoShutdownLambda}"
         }
       }
     }
@@ -749,12 +740,12 @@
       ]
     },
     "ClientIPAddress": {
-      "Description": "IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as <ip_address>/<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate.",
+      "Description": "Comma-separated list of IP address ranges that will be allowed to connect to this instance. Each IP CIDR should be formatted as <ip_address>/<mask>. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. Example of allowed values: 10.0.0.1/32 or 10.0.0.0/16,192.34.56.78/32. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate.",
       "Type": "String",
       "MinLength": "9",
-      "MaxLength": "18",
-      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-      "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x."
+      "MaxLength": "189",
+      "AllowedPattern": "^((\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))(,((\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))){0,9}$",
+      "ConstraintDescription": "Must be a comma-separated list of valid IP CIDR ranges of the form x.x.x.x/x. A maximum of 10 such IP CIDRs are allowed in the list."
     },
     "Password": {
       "NoEcho": "true",
@@ -936,24 +927,12 @@
     }
   },
   "Conditions": {
-    "UsePredefinedRole": {
+    "CreateNewRole": {
       "Fn::Equals": [
         {
           "Ref": "CustomIamRole"
         },
         ""
-      ]
-    },
-    "UseCustomIamRole": {
-      "Fn::Not": [
-        {
-          "Fn::Equals": [
-            {
-              "Ref": "CustomIamRole"
-            },
-            ""
-          ]
-        }
       ]
     },
     "UseAdditionalPolicies": {
@@ -1021,29 +1000,14 @@
     "RDPSSHConnection": {
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
-        "Fn::GetAtt": [
-          "MATLABEC2Instance",
-          "PublicDnsName"
-        ]
+        "Fn::Sub": "${MATLABEC2Instance.PublicDnsName}"
       }
     },
     "NiceDCVConnection": {
-      "Condition": "UsePredefinedRole",
+      "Condition": "CreateNewRole",
       "Description": "Url of the NICE DCV session running on the EC2 instance",
       "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "https://",
-            {
-              "Fn::GetAtt": [
-                "MATLABEC2Instance",
-                "PublicDnsName"
-              ]
-            },
-            ":8443/#console"
-          ]
-        ]
+        "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8443/#console"
       }
     },
     "BrowserConnection": {
@@ -1057,22 +1021,7 @@
       "Condition": "UseCloudWatch",
       "Description": "The cloudwatch logs containing logging information about the MATLAB instance",
       "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "https://console.aws.amazon.com/cloudwatch/home?region=",
-            {
-              "Ref": "AWS::Region"
-            },
-            "#logsV2:log-groups/log-group/",
-            {
-              "Fn::GetAtt": [
-                "MWLogLocation",
-                "Outputs.LogGroupName"
-              ]
-            }
-          ]
-        ]
+        "Fn::Sub": "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logsV2:log-groups/log-group/${MWLogLocation.Outputs.LogGroupName}"
       }
     }
   },

@@ -26,6 +26,7 @@ function Invoke-MATLABStartupAccelerator {
 
     if ($MATLABRoot) {
         & "$MATLABRoot\bin\win64\MATLABStartupAccelerator.exe" 64 $MATLABRoot "$Env:ProgramData\MathWorks\msa.ini" "$Env:ProgramData\MathWorks\msa.log"
+        (Get-Item "$MATLABRoot\toolbox\local\toolbox_cache-win64.xml").LastWriteTime = Get-Date
     }
 
     Write-Output 'Done with Invoke-MATLABStartupAccelerator.'

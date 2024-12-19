@@ -57,10 +57,15 @@ function Get-NVidiaGridDrivers {
     # Reference: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/install-nvidia-driver.html#nvidia-GRID-driver
     # Download NVIDIA grid drivers. A user of the reference architecture can choose to install them using the script Install-NVIDIAGridDriver.ps1
 
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $GridDriverVersion
+    )
+
     Write-Output 'Starting Get-NVidiaGridDrivers ...'
 
     $Bucket = 'ec2-windows-nvidia-drivers'
-    $KeyPrefix = 'grid-16.7'
+    $KeyPrefix = "grid-$GridDriverVersion"
     $LocalPath = 'C:\Windows\NVIDIADrivers\'
 
     # Create a new folder to store scripts and installers related to NVIDIA GRID drivers
@@ -80,6 +85,7 @@ function Get-NVidiaGridDrivers {
     # Move GRID Drivers installation script to the directory created above
     Move-Item -Path 'C:\Windows\Temp\runtime\Install-NVIDIAGridDriver.ps1' -Destination 'C:\Windows\NVIDIADrivers\Install-NVIDIAGridDriver.ps1'
     Set-Content -Path 'C:\Windows\NVIDIADrivers\instances-supporting-grid-drivers.txt' -Value 'g3,g4dn,g5'
+    Set-Content -Path 'C:\Windows\NVIDIADrivers\grid-driver-version.txt' -Value $GridDriverVersion
 
     Write-Output 'Done with Get-NVidiaGridDrivers.'
 }
@@ -223,14 +229,17 @@ function Install-Dependencies {
         [string] $PythonInstallerUrl,
 
         [Parameter(Mandatory = $true)]
-        [string] $DcvInstallerUrl
+        [string] $DcvInstallerUrl,
+
+        [Parameter(Mandatory = $true)]
+        [string] $GridDriverVersion
     )
 
     Install-AwsCli
     Install-CloudWatchAgent
     Install-DotNetFramework35
     Install-UnrealEngineDependencies
-    Get-NVidiaGridDrivers
+    Get-NVidiaGridDrivers -GridDriverVersion $GridDriverVersion
     Disable-TemporaryFoldersPerSession
     Install-NICEDCV -DcvInstallerUrl $DcvInstallerUrl
     Install-SSMAgent
@@ -241,10 +250,9 @@ function Install-Dependencies {
 
 try {
     $ErrorActionPreference = 'Stop'
-    Install-Dependencies -PythonInstallerUrl $Env:PYTHON_INSTALLER_URL -DcvInstallerUrl $Env:DCV_INSTALLER_URL
+    Install-Dependencies -PythonInstallerUrl $Env:PYTHON_INSTALLER_URL -DcvInstallerUrl $Env:DCV_INSTALLER_URL -GridDriverVersion $Env:NVIDIA_GRID_DRIVER_VERSION
 }
 catch {
     $ScriptPath = $MyInvocation.MyCommand.Path
-    Write-Output "ERROR - An error occurred while running script 'Install-Dependencies': $ScriptPath. Error: $_"
-    throw
+    Write-Output "ERROR - An error occurred while running script 'Install-Dependencies': $ScriptPath. Error: $_" 
 }

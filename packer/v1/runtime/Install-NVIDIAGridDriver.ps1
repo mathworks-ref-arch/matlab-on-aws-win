@@ -41,6 +41,9 @@ function Install-NVidiaGridDrivers {
     $AllowedClasses = $(Get-Content -Path 'C:\Windows\NVIDIADrivers\instances-supporting-grid-drivers.txt')
     $AllowedClasses = $AllowedClasses.Split(',')
 
+    # Get Driver version to install, ex: 16.7, 17.3 ...
+    $GridDriverVersion = $(Get-Content -Path 'C:\Windows\NVIDIADrivers\grid-driver-version.txt')
+
     # Get Windows Server version number. ex: 2019, 2022 ...
     $WindowsVersion = (Get-ComputerInfo).OsName
     $VersionNumber = ($WindowsVersion -split '\s+')[3]
@@ -53,7 +56,7 @@ function Install-NVidiaGridDrivers {
 
     if ($AllowedClasses.Contains($InstanceClass)) {
         Write-Output "Installing GRID Drivers...`n`n"
-        $InstallerPath = 'C:\Windows\NVIDIADrivers\grid-16.7'
+        $InstallerPath = "C:\Windows\NVIDIADrivers\grid-$GridDriverVersion"
         $SetupFile = $(Get-ChildItem -Path $InstallerPath -Filter "*server$VersionNumber*").Name
         Write-Output "Using setup file $SetupFile present under $InstallerPath `n`n"
         Start-Process "$InstallerPath\$SetupFile" -ArgumentList "-s -n -log:`"C:\Windows\NVIDIADrivers\logs`" -loglevel:6" -Wait -NoNewWindow

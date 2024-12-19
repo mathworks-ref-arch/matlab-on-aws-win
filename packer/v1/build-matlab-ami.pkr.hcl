@@ -96,6 +96,12 @@ variable "NVIDIA_DRIVER_INSTALLER_URL" {
   description = "The URL to install NVIDIA drivers into the target machine image."
 }
 
+variable "NVIDIA_GRID_DRIVER_VERSION" {
+  type        = string
+  default     = "16.7"
+  description = "The version of the NVIDIA GRID driver for use with G6, Gr6, G6e, G5, G4dn, and G3 instances."
+}
+
 variable "PYTHON_INSTALLER_URL" {
   type        = string
   default     = "https://www.python.org/ftp/python/3.10.5/python-3.10.5-amd64.exe"
@@ -287,6 +293,7 @@ build {
       "PRODUCTS=${var.PRODUCTS}",
       "SPKGS=${var.SPKGS}",
       "NVIDIA_DRIVER_INSTALLER_URL=${var.NVIDIA_DRIVER_INSTALLER_URL}",
+      "NVIDIA_GRID_DRIVER_VERSION=${var.NVIDIA_GRID_DRIVER_VERSION}",
       "DCV_INSTALLER_URL=${var.DCV_INSTALLER_URL}",
       "PYTHON_INSTALLER_URL=${var.PYTHON_INSTALLER_URL}",
       "MATLAB_SOURCE_URL=${var.MATLAB_SOURCE_URL}",
