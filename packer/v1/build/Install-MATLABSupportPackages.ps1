@@ -6,7 +6,7 @@
     https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md
 
 .NOTES
-    Copyright 2024 The MathWorks, Inc.
+    Copyright 2024-2025 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -43,16 +43,29 @@ function Install-MATLABSPKGUsingMPM {
                 --products $ProductsList
         }
         else {
-            aws s3 cp $SourceURL "$Env:TEMP\spkg.zip"
-            Expand-Archive -Path "$Env:TEMP\spkg.zip" -DestinationPath $Env:TEMP\spkg_source -Force
-            Move-Item -Path "$Env:ProgramData\MathWorks\VersionInfo.xml" -Destination "$Env:TEMP\spkg_source"
-            Remove-Item -Path "$Env:TEMP\spkg.zip"
+            # Dot-sourcing the Mount-DataDriveUtils script
+            . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
+
+            # Setup extra volume to mount drive containing MATLAB Support Packages source files
+            $SpkgSourceDrive = 'X'
+            $SpkgSourcePath = 'X:\spkg_source'
+
+            Mount-DataDrive -DriveToMount "$SpkgSourceDrive"
+            Get-MATLABSourceFiles -SourceURL $SourceURL -Destination "$SpkgSourcePath"
+
+            Copy-Item -Path "$Env:ProgramFiles\MATLAB\${Release}\VersionInfo.xml" -Destination "$SpkgSourcePath"
+
+            $SourcePath = Get-ChildItem -Path "$SpkgSourcePath" -Directory -Recurse -Filter 'archives' | Select-Object -First 1 -ExpandProperty FullName
+
+            if (-not $SourcePath) {
+                throw 'Failed to find MATLAB source files at the specified location'
+            }
 
             & "$Env:TEMP\mpm.exe" install `
-                --source=$Env:TEMP\spkg_source\archives `
+                --source=$SourcePath `
                 --products $ProductsList
 
-            Remove-Item -Path $Env:TEMP\spkg_source -Recurse -Force
+            Dismount-DataDrive -DriveLetter "$SpkgSourceDrive"
         }
     }
     catch {

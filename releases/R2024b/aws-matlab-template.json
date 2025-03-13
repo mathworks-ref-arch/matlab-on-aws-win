@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-061bb2b5abe6924a2"
+        "AMI": "ami-0bc7b222281e752f5"
       },
       "us-east-2": {
-        "AMI": "ami-0281ae99e8b13e3a2"
+        "AMI": "ami-055e8721ea65108e8"
       },
       "us-west-1": {
-        "AMI": "ami-0368b9e711b0dacdb"
+        "AMI": "ami-01acb3d73b0411ef7"
       },
       "us-west-2": {
-        "AMI": "ami-01447a33194fdc3b6"
+        "AMI": "ami-069ed2138631255de"
       },
       "ca-central-1": {
-        "AMI": "ami-0f94d6a65f5264ccd"
+        "AMI": "ami-0832ead9b4ee7471f"
       },
       "eu-central-1": {
-        "AMI": "ami-045f81fcd7b755204"
+        "AMI": "ami-068412196fe2cc931"
       },
       "eu-west-1": {
-        "AMI": "ami-0f22fbb5153b8fd43"
+        "AMI": "ami-07713f23e5fd5e4c7"
       },
       "eu-west-2": {
-        "AMI": "ami-0e1c1836f5854ba89"
+        "AMI": "ami-067f69cce4f1cdd99"
       },
       "eu-west-3": {
-        "AMI": "ami-03679d8265ed6b50e"
+        "AMI": "ami-0f7a83b6c6e36d8e0"
       },
       "eu-north-1": {
-        "AMI": "ami-0629940491e1c4ace"
+        "AMI": "ami-077fe05fc5ff00321"
       },
       "sa-east-1": {
-        "AMI": "ami-0d669828f6cb2415d"
+        "AMI": "ami-08704a7aa486cf05a"
       },
       "me-south-1": {
-        "AMI": "ami-0d0724cbb6f6db59a"
+        "AMI": "ami-0c8359cda60e76275"
       },
       "ap-east-1": {
-        "AMI": "ami-0e5914d8dea65644a"
+        "AMI": "ami-0fe1ba56afd28eaa8"
       },
       "ap-south-1": {
-        "AMI": "ami-063bb05b10dc5e20b"
+        "AMI": "ami-0c0f2f0505b204616"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0fbb59c8ffe2d1c40"
+        "AMI": "ami-015dfc654e1f0c93c"
       },
       "ap-northeast-2": {
-        "AMI": "ami-0bed460c8c17fec19"
+        "AMI": "ami-0406c37a2e2b4dff0"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0d07e43c33a3516b1"
+        "AMI": "ami-01e0dbe5c8cc345c8"
       },
       "ap-southeast-2": {
-        "AMI": "ami-00e65b1bc4f88ceb6"
+        "AMI": "ami-09339faec227275f8"
       }
     }
   },
@@ -111,7 +111,7 @@
                         "logs:PutLogEvents"
                       ],
                       "Resource": {
-                        "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MWLogLocation.Outputs.LogGroupName}:*"
+                        "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MWLogLocation}:*"
                       }
                     }
                   ]
@@ -343,6 +343,26 @@
         ]
       }
     },
+    "EC2AutoShutdown": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Condition": "EnableAutoShutdown",
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete",
+      "Properties": {
+        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/ec2-shutdown-lambda/v1/0/1/ec2-shutdown-lambda.yml",
+        "Parameters": {
+          "EC2InstanceId": {
+            "Ref": "MATLABEC2Instance"
+          },
+          "MathWorksProductId": "MathWorks-MATLAB-Windows",
+          "ShutdownBehaviour": {
+            "Ref": "AutoShutdown"
+          },
+          "TagToMonitor": "mw-autoshutdown",
+          "AutoShutdownLambdaLogRetentionInDays": 1
+        }
+      }
+    },
     "MWSecurityGroup": {
       "Type": "AWS::CloudFormation::Stack",
       "DeletionPolicy": "Delete",
@@ -364,13 +384,8 @@
       }
     },
     "MWLogLocation": {
-      "Type": "AWS::CloudFormation::Stack",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Delete",
-      "Condition": "UseCloudWatch",
-      "Properties": {
-        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/log-location/v1/0/0/log-location.yml"
-      }
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "UseCloudWatch"
     },
     "MATLABEC2Instance": {
       "Type": "AWS::EC2::Instance",
@@ -487,10 +502,7 @@
                         "Fn::If": [
                           "UseCloudWatch",
                           {
-                            "Fn::GetAtt": [
-                              "MWLogLocation",
-                              "Outputs.LogGroupName"
-                            ]
+                            "Ref": "MWLogLocation"
                           },
                           ""
                         ]
@@ -542,141 +554,6 @@
       "Properties": {
         "InstanceId": {
           "Ref": "MATLABEC2Instance"
-        }
-      }
-    },
-    "AutoShutdownLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "# Copyright 2021-23 The MathWorks Inc.\nimport boto3,os,re\nfrom datetime import datetime as dt,timedelta\n\nec2=boto3.client(\"ec2\")\nDEFAULT_TIME_INTERVAL=os.environ['DEFAULT_TIME_INTERVAL']\n# Uniquely identify instance using AWS-provided stack-level tags\nres=ec2.describe_instances(Filters=[{'Name':'tag:aws:cloudformation:stack-name','Values':[os.environ['STACK_NAME']]},{'Name':'tag:aws:cloudformation:logical-id','Values':['MATLABEC2Instance']},{'Name': 'instance-state-name','Values': ['running', 'pending']}])\nINSTANCE=res[\"Reservations\"][0][\"Instances\"][0]\nINSTANCE_ID=INSTANCE[\"InstanceId\"]\nLOG_MESSAGES={\"instance-stopped\":\"Instance is stopped.\",\"tag-never\":\"Autoshutdown is not enabled. Change the value of mw-autoshutdown tag of the EC2 instance to enable the autoshutdown feature.\",\"tag-invalid\":\"The value of the mw-autoshutdown tag you have set is not valid. The format of the timestamp must be a valid RFC 1123 UTC timestamp, such as Thu, 16 Dec 2021 12:28:47 GMT.\",\"instance-booted\":\"Instance has just started. Setting mw-autoshutdown value.\",\"stop-instance\":\"Shutdown time has been reached. Shutting instance down.\",\"early-to-shutdown\":\"Shutdown time has not been reached yet. Too early to shutdown instance.\"}\nRET_VAL={\"statusCode\": 200}\n\ndef log_to_cloudwatch(id):\n    print(LOG_MESSAGES[id])\n\ndef get_start_time():\n    launch_time=INSTANCE[\"LaunchTime\"]\n    return re.sub(r\"\\+00:00\",\"\",str(launch_time))\n\ndef get_shutdown_tag():\n    tags=INSTANCE[\"Tags\"]\n    shutdown_tag=next((tag for tag in tags if tag[\"Key\"]==\"mw-autoshutdown\"), None)\n    return shutdown_tag\n\ndef set_shutdown_tag(shutdown_time):\n    ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-autoshutdown\",\"Value\": str(shutdown_time)}])\n\ndef set_shutdown_time():\n    time_interval=int(re.findall(\"[0-9]+\",DEFAULT_TIME_INTERVAL)[0])\n    launch_time=dt.fromisoformat(get_start_time())\n    shutdown_time=launch_time+timedelta(hours=int(time_interval))\n    shutdown_time_gmt=dt.strftime(shutdown_time,'%a, %d %b %Y %H:%M:%S GMT')\n    set_shutdown_tag(shutdown_time_gmt)\n\ndef lambda_handler(event, context):\n    # No action while the instance is stopped.\n    if INSTANCE[\"State\"][\"Name\"]==\"stopped\":\n        log_to_cloudwatch(id=\"instance-stopped\")\n        return RET_VAL\n    shutdown_tag=get_shutdown_tag()\n    # In the first function run, use DEFAULT_TIME_INTERVAL to determine what to do.\n    if shutdown_tag is None:\n        if DEFAULT_TIME_INTERVAL==\"Never\":\n            # Set the tag to \"never\".\n            set_shutdown_tag(\"never\")\n            # No action when tag is \"never\"\n            log_to_cloudwatch(id=\"tag-never\")\n            return RET_VAL\n        else:\n            # Set the tag to start time + user chosen time interval.\n            set_shutdown_time()\n            log_to_cloudwatch(id=\"instance-booted\")\n            return RET_VAL\n    # If the tag exists, use it to determine what to do.\n    if shutdown_tag[\"Value\"]==\"change_me_on_boot\":\n        set_shutdown_time()\n        log_to_cloudwatch(id=\"instance-booted\")\n        return RET_VAL\n    elif shutdown_tag[\"Value\"]==\"never\":\n        # No action when tag is \"never\"\n        log_to_cloudwatch(id=\"tag-never\")\n        return RET_VAL\n    else:\n        # Check the tag value to determine whether instance needs to be shutdown.\n        try:\n            shutdown_time=dt.strptime(shutdown_tag[\"Value\"],'%a, %d %b %Y %H:%M:%S GMT')\n        except ValueError:\n            log_to_cloudwatch(id=\"tag-invalid\")\n            return RET_VAL\n        curr_time=dt.now(shutdown_time.tzinfo)\n        if curr_time>shutdown_time:\n            ec2.stop_instances(InstanceIds=[INSTANCE_ID])\n            # Set the shutdown time as mw-last-autoshutdown-event tag\n            curr_time_gmt=dt.strftime(curr_time, '%a, %d %b %Y %H:%M:%S GMT')\n            ec2.create_tags(Resources=[INSTANCE_ID], Tags=[{\"Key\": \"mw-last-autoshutdown-event\",\"Value\": str(curr_time_gmt)}])\n            log_to_cloudwatch(id=\"stop-instance\")\n            if DEFAULT_TIME_INTERVAL==\"Never\":\n                set_shutdown_tag(\"never\")\n            else:\n                set_shutdown_tag(\"change_me_on_boot\")\n            return RET_VAL\n        else:\n            log_to_cloudwatch(id=\"early-to-shutdown\")\n            return RET_VAL"
-        },
-        "Environment": {
-          "Variables": {
-            "DEFAULT_TIME_INTERVAL": {
-              "Ref": "AutoShutdown"
-            },
-            "STACK_NAME": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        },
-        "Handler": "index.lambda_handler",
-        "Runtime": "python3.12",
-        "Timeout": "60",
-        "Role": {
-          "Fn::Sub": "${AutoShutdownLambdaRole.Arn}"
-        }
-      }
-    },
-    "AutoShutdownLambdaRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": {
-                  "Fn::Sub": "lambda.${AWS::URLSuffix}"
-                }
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
-        },
-        "Path": "/MW/",
-        "Policies": [
-          {
-            "PolicyName": "autoshutdown-policy",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:DescribeInstances",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:DescribeTags",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "ec2:Stopinstances",
-                    "ec2:CreateTags",
-                    "ec2:DeleteTags"
-                  ],
-                  "Resource": {
-                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
-                  },
-                  "Condition": {
-                    "StringEquals": {
-                      "aws:ResourceTag/mw-ProductID": "MathWorks-MATLAB-Windows",
-                      "aws:ResourceTag/mw-StackName": {
-                        "Ref": "AWS::StackName"
-                      }
-                    }
-                  }
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                  ],
-                  "Resource": {
-                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*AutoShutdownLambda*"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    "AutoShutdownScheduledRule": {
-      "Type": "AWS::Events::Rule",
-      "Properties": {
-        "Description": "AutoShutdownScheduledRule",
-        "ScheduleExpression": "rate(15 minutes)",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::Sub": "${AutoShutdownLambda.Arn}"
-            },
-            "Id": "TargetFunctionV1"
-          }
-        ]
-      }
-    },
-    "PermissionForEventsToInvokeLambda": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "AutoShutdownLambda"
-        },
-        "Action": "lambda:InvokeFunction",
-        "Principal": {
-          "Fn::Sub": "events.${AWS::URLSuffix}"
-        },
-        "SourceArn": {
-          "Fn::Sub": "${AutoShutdownScheduledRule.Arn}"
-        }
-      }
-    },
-    "AutoShutdownLambdaLogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Delete",
-      "Properties": {
-        "LogGroupName": {
-          "Fn::Sub": "/aws/lambda/${AutoShutdownLambda}"
         }
       }
     }
@@ -791,9 +668,10 @@
       "Default": "No"
     },
     "AutoShutdown": {
-      "Description": "Choose whether you want to enable autoshutdown for your instance after a certain number of hours",
+      "Description": "Choose whether you want to enable autoshutdown for your instance after a certain number of hours. Select 'Never' to disable auto-termination now but you can enable it later. Select 'Disable auto-termination' to fully disable this feature or if you do not have the permissions to create and assign roles in your subscription.",
       "Type": "String",
       "AllowedValues": [
+        "Disable auto-termination ",
         "Never",
         "After 1 hour",
         "After 2 hours",
@@ -927,6 +805,18 @@
     }
   },
   "Conditions": {
+    "EnableAutoShutdown": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "AutoShutdown"
+            },
+            "Disable auto-termination"
+          ]
+        }
+      ]
+    },
     "CreateNewRole": {
       "Fn::Equals": [
         {
@@ -1021,7 +911,7 @@
       "Condition": "UseCloudWatch",
       "Description": "The cloudwatch logs containing logging information about the MATLAB instance",
       "Value": {
-        "Fn::Sub": "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logsV2:log-groups/log-group/${MWLogLocation.Outputs.LogGroupName}"
+        "Fn::Sub": "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logsV2:log-groups/log-group/${MWLogLocation}"
       }
     }
   },

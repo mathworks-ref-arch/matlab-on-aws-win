@@ -6,7 +6,7 @@
     https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md
 
 .NOTES
-    Copyright 2020-2024 The MathWorks, Inc.
+    Copyright 2020-2025 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -48,17 +48,30 @@ function Install-MATLABUsingMPM {
                 $DocFlag
         }
         else {
-            aws s3 cp $SourceURL "$Env:TEMP\matlab.zip"
-            Expand-Archive -Path "$Env:TEMP\matlab.zip" -DestinationPath $Env:TEMP\matlab_source -Force
-            Remove-Item -Path "$Env:TEMP\matlab.zip"
+            # Dot-sourcing the Mount-DataDriveUtils script
+            . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
+
+            # Setup extra volume to mount drive containing MATLAB source files
+            $MATLABSourceDrive = 'X'
+            $MATLABSourcePath = 'X:\matlab_source'
+
+            Mount-DataDrive -DriveToMount "$MATLABSourceDrive"
+            Get-MATLABSourceFiles -SourceURL $SourceURL -Destination "$MATLABSourcePath"
+
+            # The source path must contain an archives folder that mpm uses for installation
+            $SourcePath = Get-ChildItem -Path "$MATLABSourcePath" -Directory -Recurse -Filter 'archives' | Select-Object -First 1 -ExpandProperty FullName
+
+            if (-not $SourcePath) {
+                throw 'Failed to find MATLAB source files at the specified location'
+            }
+
             & "$Env:TEMP\mpm.exe" install `
-                --source=$Env:TEMP\matlab_source\dvd\archives `
+                --source=$SourcePath `
                 --products $ProductsList `
                 $DocFlag
 
-            # Save MATLAB VersionInfo file to use with SPKG installation later
-            Copy-Item -Path "$Env:TEMP\matlab_source\dvd\VersionInfo.xml" -Destination "$Env:ProgramData\MathWorks"
-            Remove-Item -Path "$Env:TEMP\matlab_source" -Recurse -Force
+            Dismount-DataDrive -DriveLetter "$MATLABSourceDrive"
+
         }
     }
     catch {

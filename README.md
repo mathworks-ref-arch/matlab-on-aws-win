@@ -20,27 +20,24 @@ You need:
 You are responsible for the cost of the AWS services used when you create cloud resources using this guide. Resource settings, such as instance type, affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you will be using. Prices are subject to change.
 
 # Deployment Steps
-By default, the MATLAB reference architectures below launch prebuilt machine images, described in [Architecture and Resources](#architecture-and-resources). Using a prebuilt machine image is the easiest way to deploy a MATLAB reference architecture. Alternatively, to build your own machine image with MATLAB using our build scripts, see [Build and Deploy Your Own Machine Image](#build-and-deploy-your-own-machine-image).
+By default, the MATLAB reference architectures below launch prebuilt machine images, described in [Architecture and Resources](#architecture-and-resources). Using a prebuilt machine image is the easiest way to deploy a MATLAB reference architecture.
+Prebuilt images are provided for the five most recent MATLAB releases.
+Alternatively, to build your own machine image,
+see [Build and Deploy Your Own Machine Image](#build-and-deploy-your-own-machine-image).
+You can also use this workflow to install an earlier MATLAB release.
 
 ## Deploy Prebuilt Machine Image
 
 To view instructions for deploying the MATLAB reference architecture, select a MATLAB release:
 
-| Linux | Windows |
-| ----- | ------- |
-| [R2024b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2024b/README.md) | [R2024b](releases/R2024b/README.md) |
-| [R2024a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2024a/README.md) | [R2024a](releases/R2024a/README.md) |
-| [R2023b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023b/README.md) | [R2023b](releases/R2023b/README.md) |
-| [R2023a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023a/README.md) | [R2023a](releases/R2023a/README.md) |
-| [R2022b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2022b/README.md) | [R2022b](releases/R2022b/README.md) |
-| [R2022a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2022a/README.md) | [R2022a](releases/R2022a/README.md) |
-| [R2021b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2021b/README.md) | [R2021b](releases/R2021b/README.md) |
-| [R2021a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2021a/README.md) | [R2021a](releases/R2021a/README.md) |
-| [R2020b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2020b/README.md) | [R2020b](releases/R2020b/README.md) |
-| [R2020a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2020a/README.md) |  |
-| [R2019b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2019b/README.md) |  |
-| [R2019a\_and\_older](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2019a_and_older/README.md) |  |
-
+| Linux | Windows | Status |
+| ----- | ------- | ------- |
+| [R2024b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2024b/README.md) | [R2024b](releases/R2024b/README.md) | ✅ Prebuilt available. |
+| [R2024a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2024a/README.md) | [R2024a](releases/R2024a/README.md) | ✅ Prebuilt available. |
+| [R2023b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023b/README.md) | [R2023b](releases/R2023b/README.md) | ✅ Prebuilt available. |
+| [R2023a](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2023a/README.md) | [R2023a](releases/R2023a/README.md) | ⚠️ Prebuilt will be removed in September 2025. |
+| [R2022b](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/releases/R2022b/README.md) | [R2022b](releases/R2022b/README.md) | ⚠️ Prebuilt will be removed in March 2025. |
+| [Earlier/Custom](https://github.com/mathworks-ref-arch/matlab-on-aws/tree/master/packer/v1) | [Earlier/Custom](./packer/v1) | For earlier MATLAB releases, you must build your own machine image. |
 
 The above instructions allow you to launch instances based on the latest MathWorks&reg; Amazon Machine Images (AMIs).
 MathWorks periodically replaces older AMIs with new images.
@@ -49,6 +46,11 @@ For more details, see
 
 ## Build and Deploy Your Own Machine Image		
 For details of the scripts which form the basis of the MathWorks Windows AMI build process, see [Build Your Own Machine Image](./packer/v1). You can use these scripts to build your own custom Windows machine image for running MATLAB on Amazon Web Services. You can then deploy this custom image with the MathWorks infrastructure as code (IaC) templates.
+
+You can customize the MATLAB release which is installed as part of this custom build.
+This includes MATLAB releases supported by the prebuilt images, as well as earlier MATLAB releases.
+For more details,
+see [Customize MATLAB Release to Install](./packer/v1#customize-matlab-release-to-install).
 
 Platform engineering teams can use these scripts to take advantage of optimizations MathWorks has developed for running MathWorks products in the cloud. For more details, see [What are the advantages of building images with MathWorks scripts?](#what-are-the-advantages-of-building-images-with-mathworks-scripts)
 
@@ -140,6 +142,6 @@ To request assistance or additional features, contact [MathWorks Technical Suppo
 
 ----
 
-Copyright 2018-2024 The MathWorks, Inc.
+Copyright 2018-2025 The MathWorks, Inc.
 
 ----
