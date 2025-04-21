@@ -126,7 +126,7 @@ You can now deploy the AMI in your target region using the AMI that you copied.
 You can customize a prebuilt AMI by launching the reference architecture, applying changes you want to the EC2 Instance (such as installing additional software, drivers, and files), then saving an image of that instance using the AWS Console. For more information, see [How do I save or copy an AMI?](#how-do-i-save-or-copy-an-ami). When you create a stack, replace the AMI ID in the CloudFormation template with the AMI ID of your customized image.
 
 ### How do I use a different license manager?
-The AMI uses MathWorks Hosted License Manager by default. For information on how to use other license managers, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/licensingoncloud/matlab-on-the-cloud.html).
+The AMI uses MathWorks Hosted License Manager by default. For information on how to use other license managers, see [MATLAB Licensing in the Cloud](https://www.mathworks.com/help/install/license/licensing-for-mathworks-products-running-on-the-cloud.html).
 
 ### What are the advantages of building images with MathWorks scripts?
 Images built with MathWorks scripts are optimized and tested for MathWorks workflows. The images are deployed by MathWorks CloudFormation templates following AWS best practices.

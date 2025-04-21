@@ -48,14 +48,14 @@ After you click the Launch Stack button above, the “Create stack” page will 
 | **Subnet** | ID of an existing subnet |
 | **RDP Key Pair** | Name of an existing EC2 KeyPair to allow RDP access to all the instances. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html for details on creating these. |
 | **Enable browser access for MATLAB** | Option that enables access to MATLAB on your cloud MATLAB instance within a browser. Opening MATLAB in a browser opens a separate MATLAB session to your Remote Desktop Protocol (RDP) session or NICE DCV session. |
-| **Allow RDP and SSH connections from** | IP address range that will be allowed to connect to this instance from outside of the VPC. This field should be formatted as \<ip_address>/\<mask>. E.g. 10.0.0.1/32. This is the public IP address which can be found by searching for 'what is my ip address' on the web. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
+| **Allow RDP and SSH connections from** | Comma-separated list of IP address ranges that will be allowed to connect to this instance. Each IP CIDR should be formatted as \<ip_address>/\<mask>. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. Example of allowed values: 10.0.0.1/32 or 10.0.0.0/16,192.34.56.78/32. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate. |
 | **Remote password** | Password for the user Administrator. You also need to enter this as an authentication token to access MATLAB on your cloud instance within a browser. |
 | **Confirm remote password** | Confirm Password |
 | **License Manager for MATLAB connection string** | Optional License Manager for MATLAB, specified as a string in the form \<port>@\<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws. |
 | **Configure cloudwatch logging for the MATLAB instance** | Flag indicating whether cloudwatch logging for the MATLAB instance is enabled. |
 | **Additional security group to place instances in** | ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group. |
 | **Use Elastic IP address that persists across machine reboots** | Flag indicating whether you want to keep the same public IP address for the instance. |
-| **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours |
+| **AutoShutdown** | Choose whether you want to enable autoshutdown for your instance after a certain number of hours. Select 'Never' to disable auto-termination now but you can enable it later. Select 'Disable auto-termination' to fully disable this feature or if you do not have the permissions to create and assign roles in your subscription. |
 | **Custom AMI ID (Optional)** | ID of a custom Amazon Machine Image (AMI) in the target region (optional). If the build has been customized then the resulting machine image may no longer be compatible with the provided CloudFormation template. Compatability can in some cases be restored by making corresponding modifications to the CloudFormation template. The ID should start with 'ami-'. |
 | **Optional user inline command** | Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: \<[System.Environment]::SetEnvironmentVariable("CLOUD","AWS", "Machine");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: \<Invoke-WebRequest "https://www.example.com/script.ps1" -OutFile script.ps1; .\script.ps1>. Find the logs at '$Env:ProgramData\MathWorks\startup.log'. |
 
@@ -106,6 +106,6 @@ This CloudFormation template uses nested stacks to reference templates used by m
 
 ----
 
-Copyright 2020-2024 The MathWorks, Inc.
+Copyright 2020-2025 The MathWorks, Inc.
 
 ----
