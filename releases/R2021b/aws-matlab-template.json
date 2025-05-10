@@ -749,7 +749,7 @@
       "Description": "Optional License Manager for MATLAB, specified as a string in the form <port>@<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws.",
       "Type": "String",
       "Default": "",
-      "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-]+)?",
+      "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-_]+)?",
       "ConstraintDescription": "If specified, must be in the form <port>@<hostname>"
     },
     "EnableCloudWatch": {
