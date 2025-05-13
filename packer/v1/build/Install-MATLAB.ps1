@@ -85,7 +85,7 @@ function Install-MATLABUsingMPM {
 
     Write-Output 'Removing mpm ...'
     Remove-Item "$Env:TEMP/mpm.exe"
-
+    
     if (Test-Path $MpmLogFilePath) {
         Remove-Item $MpmLogFilePath
     }

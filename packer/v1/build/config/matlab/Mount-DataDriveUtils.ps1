@@ -137,6 +137,9 @@ function Mount-DataDrive {
     # AWS formats the serial number of disk in the format "volXXXX"
     $FormattedVolumeID = $VolumeID.Replace("-", "")
 
+    # Sleep for 10 seconds to make sure the mounted disk is ready
+    Start-Sleep -Seconds 10
+
     # Find the physical disk by matching the formatted volume ID with the serial number
     $Disk = Get-PhysicalDisk | Where-Object {
         $_.SerialNumber -like "*$FormattedVolumeID*"

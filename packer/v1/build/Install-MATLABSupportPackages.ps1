@@ -29,14 +29,16 @@ function Install-MATLABSPKGUsingMPM {
 
     # As a best practice, downloading the latest version of mpm before calling it.
     Write-Output 'Downloading mpm ...'
+    
     Invoke-WebRequest -OutFile "$Env:TEMP\mpm.exe" -Uri 'https://www.mathworks.com/mpm/win64/mpm'
-
+    
     $MpmLogFilePath = "$Env:TEMP\mathworks_$Env:USERNAME.log"
 
     Write-Output 'Installing products ...'
     $ProductsList = $Products -Split ' '
 
     try {
+
         if ( $SourceURL.length -eq 0 ) {
             & "$Env:TEMP\mpm.exe" install `
                 --release $Release `
