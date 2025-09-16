@@ -1,4 +1,4 @@
-# Copyright 2024 The MathWorks, Inc.
+# Copyright 2024-2025 The MathWorks, Inc.
 
 packer {
   required_plugins {
@@ -16,7 +16,7 @@ packer {
 
 variable "RELEASE" {
   type        = string
-  default     = "R2024a"
+  default     = "R2025b"
   description = "Target MATLAB release to install in the machine image, must start with \"R\"."
 
   validation {
@@ -199,6 +199,12 @@ variable "MATLAB_PROXY_VERSION" {
   description = "The matlab-proxy version to use."
 }
 
+variable "WINRM_PORT" {
+  type  = string
+  default = "5986"
+  description = "The WinRM port to use for connecting to the Windows instance during the build process."
+}
+
 # Set up local variables used by provisioners.
 locals {
   timestamp             = regex_replace(timestamp(), "[- TZ:]", "")
@@ -207,6 +213,7 @@ locals {
   runtime_scripts       = [for s in var.RUNTIME_SCRIPTS : format("runtime/%s", s)]
   packer_admin_username = "${var.PACKER_ADMIN_USERNAME}"
   packer_admin_password = "${var.PACKER_ADMIN_PASSWORD}"
+  winrm_port            = "${var.WINRM_PORT}"
 }
 
 # Configure the EC2 instance that is used to build the machine image.
@@ -238,12 +245,20 @@ source "amazon-ebs" "AMI_Builder" {
   run_tags                                  = "${var.INSTANCE_TAGS}"
   tags                                      = "${var.AMI_TAGS}"
   temporary_security_group_source_public_ip = true
-  user_data                                 = templatefile("./build/config/packer/bootstrap_win.pkrtpl.hcl", { winrm_username = local.packer_admin_username, winrm_password = local.packer_admin_password })
+  user_data = templatefile("./build/config/packer/bootstrap_win.pkrtpl.hcl", { winrm_username = local.packer_admin_username, winrm_password = local.packer_admin_password, winrm_port = local.winrm_port })
   vpc_id                                    = "${var.VPC_ID}"
   winrm_username                            = "${local.packer_admin_username}"
   winrm_password                            = "${local.packer_admin_password}"
-  iam_instance_profile                      = "${var.AWS_INSTANCE_PROFILE}"
+  winrm_port                                = "${local.winrm_port}"
 
+  # Enables HTTPS for the WinRM communication
+  winrm_use_ssl                             = true
+  
+  # Since we are using a self-signed certificate for the WinRM HTTPs listener, 
+  # this setting tells Packer client to skip the certificate validation
+  winrm_insecure                            = true
+
+  iam_instance_profile                      = "${var.AWS_INSTANCE_PROFILE}"
   # The `Get-NVidiaGridDrivers` function involves retrieving files from an AWS-owned S3 bucket, which needs S3 permissions for the packer EC2.
   # If you are adding/updating scripts that require AWS permissions from inside the Packer EC2 instance, you can add those permissions here.
   temporary_iam_instance_profile_policy_document {
@@ -305,6 +320,7 @@ build {
 
   provisioner "windows-restart" {
     restart_check_command = "powershell -command \"& {Write-Output 'System restarted.'}\""
+    restart_timeout       = "10m"
   }
 
   provisioner "powershell" {

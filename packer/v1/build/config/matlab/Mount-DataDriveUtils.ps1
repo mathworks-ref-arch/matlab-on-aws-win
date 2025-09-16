@@ -136,13 +136,17 @@ function Mount-DataDrive {
 
     # AWS formats the serial number of disk in the format "volXXXX"
     $FormattedVolumeID = $VolumeID.Replace("-", "")
+    $Disk = $null
 
-    # Sleep for 10 seconds to make sure the mounted disk is ready
-    Start-Sleep -Seconds 10
+    Write-Output "Waiting for disk with SerialNumber containing $FormattedVolumeID to appear..."
 
-    # Find the physical disk by matching the formatted volume ID with the serial number
-    $Disk = Get-PhysicalDisk | Where-Object {
-        $_.SerialNumber -like "*$FormattedVolumeID*"
+    while ((Get-Date) -lt (Get-Date).AddSeconds(300)) {
+        $Disk = Get-PhysicalDisk | Where-Object { $_.SerialNumber -like "*$FormattedVolumeID*" }
+        if ($Disk) {
+            Write-Output "Disk found."
+            break
+        }
+        Start-Sleep -Seconds 5 # Wait 5 seconds before trying again
     }
 
     if ($Disk) {
@@ -156,7 +160,7 @@ function Mount-DataDrive {
 
         Start-Service -Name ShellHWDetection
     } else {
-        Write-Output "No disk found with the volume ID: $FormattedVolumeID"
+        throw "No disk found with the volume ID: $FormattedVolumeID."
     }
     
 }
