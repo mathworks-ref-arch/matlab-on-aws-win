@@ -6,7 +6,7 @@
     https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md
 
 .NOTES
-    Copyright 2024-2025 The MathWorks, Inc.
+    Copyright 2024-2026 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -45,13 +45,6 @@ function Install-MATLABSPKGUsingMPM {
                 --products $ProductsList
         }
         else {
-            # Dot-sourcing the Mount-DataDriveUtils script
-            . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
-
-            # Setup extra volume to mount drive containing MATLAB Support Packages source files
-            $SpkgSourceDrive = 'X'
-            $SpkgSourcePath = 'X:\spkg_source'
-
             Mount-DataDrive -DriveToMount "$SpkgSourceDrive"
             Get-MATLABSourceFiles -SourceURL $SourceURL -Destination "$SpkgSourcePath"
 
@@ -112,7 +105,20 @@ try {
         exit 0
     }
 
+    # Dot-source the utility script at the top level (script scope).
+    # Its functions are now available to all other functions in this script.
+    # We only do this if a source URL is provided, as the utils are only needed then.
+    if ($Env:SPKG_SOURCE_URL) {
+        . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
+        $SpkgSourceDrive = 'X'
+        $SpkgSourcePath = 'X:\spkg_source'
+    }
+
     Install-MATLABSupportPackages -Release $Env:RELEASE -Products $Env:SPKGS -SourceURL $Env:SPKG_SOURCE_URL
+    
+    if ($Env:SPKG_SOURCE_URL) {
+        Dismount-DataDrive -DriveLetter "$SpkgSourceDrive"
+    }
 }
 catch {
     $ScriptPath = $MyInvocation.MyCommand.Path

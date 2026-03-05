@@ -6,7 +6,7 @@
     https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md
 
 .NOTES
-    Copyright 2020-2025 The MathWorks, Inc.
+    Copyright 2020-2026 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -48,13 +48,6 @@ function Install-MATLABUsingMPM {
                 $DocFlag
         }
         else {
-            # Dot-sourcing the Mount-DataDriveUtils script
-            . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
-
-            # Setup extra volume to mount drive containing MATLAB source files
-            $MATLABSourceDrive = 'X'
-            $MATLABSourcePath = 'X:\matlab_source'
-
             Mount-DataDrive -DriveToMount "$MATLABSourceDrive"
             Get-MATLABSourceFiles -SourceURL $SourceURL -Destination "$MATLABSourcePath"
 
@@ -93,6 +86,16 @@ function Install-MATLABUsingMPM {
     Write-Output 'Done with Install-MATLABUsingMPM.'
 }
 
+function Install-MSA {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $MSAFileUrl
+    )
+
+    Invoke-WebRequest $MSAFileUrl -OutFile "C:\Windows\Temp\msa.ini"
+
+}
 
 function Initialize-MATLAB {
 
@@ -123,7 +126,7 @@ function Initialize-MATLAB {
 
     Write-Output 'Move msa.ini file for Startup Accelerator'
     if ($Release -ge 'R2021b') {
-        Copy-Item "C:\Windows\Temp\config\matlab\startup-accelerator\$Release\msa.ini" -Destination 'C:\ProgramData\MathWorks\msa.ini'
+        Copy-Item "C:\Windows\Temp\msa.ini" -Destination 'C:\ProgramData\MathWorks\msa.ini'
     }
 
     Write-Output 'Generate Toolbox cache xml if MATLAB version is greater than or equal to 2021b'
@@ -203,10 +206,14 @@ function Install-MATLAB {
         [string] $Products,
 
         [Parameter(Mandatory = $false)]
-        [string] $SourceURL
+        [string] $SourceURL,
+
+        [Parameter(Mandatory = $true)]
+        [string] $MSAFileUrl
     )
 
     Install-MATLABUsingMPM -Release $Release -Products $Products -SourceURL $SourceURL
+    Install-MSA -MSAFileUrl $MSAFileUrl
     Initialize-MATLAB -Release $Release
     Add-DesktopShortcut -Release $Release
 }
@@ -215,7 +222,20 @@ function Install-MATLAB {
 try {
     $ErrorActionPreference = 'Stop'
 
-    Install-MATLAB -Release $Env:RELEASE -Products $Env:PRODUCTS -SourceURL $Env:MATLAB_SOURCE_URL
+    # Dot-source the utility script at the top level (script scope).
+    # Its functions are now available to all other functions in this script.
+    # We only do this if a source URL is provided, as the utils are only needed then.
+    if ($Env:MATLAB_SOURCE_URL) {
+        . 'C:\Windows\Temp\config\matlab\Mount-DataDriveUtils.ps1'
+        $MATLABSourceDrive = 'X'
+        $MATLABSourcePath = 'X:\matlab_source'
+    }
+
+    Install-MATLAB -Release $Env:RELEASE -Products $Env:PRODUCTS -SourceURL $Env:MATLAB_SOURCE_URL -MSAFileUrl $Env:MSA_URL
+
+    if ($Env:MATLAB_SOURCE_URL) {
+        Dismount-DataDrive -DriveLetter "$MATLABSourceDrive"
+    }
 }
 catch {
     $ScriptPath = $MyInvocation.MyCommand.Path

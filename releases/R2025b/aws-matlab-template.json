@@ -3,58 +3,70 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-0d7a7f253f40d5744"
+        "AMI": "ami-0a2ba2e5b3fb0c488"
       },
       "us-east-2": {
-        "AMI": "ami-033e3ef73d045e9bf"
+        "AMI": "ami-083265ef228b0145d"
       },
       "us-west-1": {
-        "AMI": "ami-02c9f67351ee1d923"
+        "AMI": "ami-0ca2263c1d9c632aa"
       },
       "us-west-2": {
-        "AMI": "ami-0cc4cc297ebe1c8a6"
+        "AMI": "ami-0a9c0031e10283dec"
       },
       "ca-central-1": {
-        "AMI": "ami-0b5704be686663e7a"
+        "AMI": "ami-0cf9e06fa33b6821d"
       },
       "eu-central-1": {
-        "AMI": "ami-0597cf6688ef8034f"
+        "AMI": "ami-0076c7e845321f7a1"
       },
       "eu-west-1": {
-        "AMI": "ami-03ec3ea455f8079eb"
+        "AMI": "ami-0abb303d819fe4cce"
       },
       "eu-west-2": {
-        "AMI": "ami-05343f385e7d38772"
+        "AMI": "ami-0bc0e8b7d06ebe49a"
       },
       "eu-west-3": {
-        "AMI": "ami-0f95ffc43782820b0"
+        "AMI": "ami-07159815e1bcf806a"
       },
       "eu-north-1": {
-        "AMI": "ami-017fbc4992178a11c"
+        "AMI": "ami-0236e3c26050be7b1"
       },
       "sa-east-1": {
-        "AMI": "ami-066b9fbd45b27912c"
+        "AMI": "ami-05aa616e0a58dec7b"
       },
       "me-south-1": {
-        "AMI": "ami-0ce6a340384c3fbaf"
+        "AMI": "ami-05becb58c5423624d"
       },
       "ap-east-1": {
-        "AMI": "ami-0b8d6db095d901804"
+        "AMI": "ami-0b1f31256cc5eaaea"
       },
       "ap-south-1": {
-        "AMI": "ami-0b076552c6e9f67e9"
+        "AMI": "ami-08ed96f6d091b575c"
       },
       "ap-northeast-1": {
-        "AMI": "ami-035550a253f810b40"
+        "AMI": "ami-0064af18b8f6568aa"
       },
       "ap-northeast-2": {
-        "AMI": "ami-03aa0ce25f269bbd1"
+        "AMI": "ami-0f551fd130488fb32"
       },
       "ap-southeast-1": {
-        "AMI": "ami-03b3b68822649c673"
+        "AMI": "ami-09188dbb473446a53"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0eacddc4e0423ff2b"
+        "AMI": "ami-05410d757dee25d1e"
+      },
+      "us-gov-west-1": {
+        "AMI": "Enter the ID of a custom AMI in this region."
+      },
+      "us-gov-east-1": {
+        "AMI": "Enter the ID of a custom AMI in this region."
+      },
+      "cn-north-1": {
+        "AMI": "Enter the ID of a custom AMI in this region."
+      },
+      "cn-northwest-1": {
+        "AMI": "Enter the ID of a custom AMI in this region."
       }
     }
   },
@@ -428,28 +440,40 @@
         "KeyName": {
           "Ref": "RDPKeyName"
         },
-        "SecurityGroupIds": [
+        "NetworkInterfaces": [
           {
-            "Fn::GetAtt": [
-              "MWSecurityGroup",
-              "Outputs.SecurityGroupId"
-            ]
-          },
-          {
-            "Fn::If": [
-              "AddSG",
+            "AssociatePublicIpAddress": {
+              "Fn::If": [
+                "UsePublicIp",
+                true,
+                false
+              ]
+            },
+            "DeviceIndex": "0",
+            "SubnetId": {
+              "Ref": "Subnet"
+            },
+            "GroupSet": [
               {
-                "Ref": "AdditionalSecurityGroup"
+                "Fn::GetAtt": [
+                  "MWSecurityGroup",
+                  "Outputs.SecurityGroupId"
+                ]
               },
               {
-                "Ref": "AWS::NoValue"
+                "Fn::If": [
+                  "AddSG",
+                  {
+                    "Ref": "AdditionalSecurityGroup"
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
               }
             ]
           }
         ],
-        "SubnetId": {
-          "Ref": "Subnet"
-        },
         "InstanceType": {
           "Ref": "InstanceType"
         },
@@ -578,25 +602,34 @@
   },
   "Parameters": {
     "InstanceType": {
-      "Description": "AWS instance type to use for MATLAB. See https://aws.amazon.com/ec2/instance-types for a list of instance types.",
+      "Description": "AWS instance type to use for MATLAB. For more information about instance types, see https://aws.amazon.com/ec2/instance-types.",
       "Default": "m5.xlarge",
       "Type": "String"
     },
     "InstanceName": {
-      "Description": "Name for the MATLAB virtual machine",
+      "Description": "Name for the MATLAB virtual machine.",
       "Default": "MATLAB Desktop",
       "Type": "String"
     },
+    "EnablePublicIPAddress": {
+      "Description": "Choose whether to attach a public IP address to the MATLAB EC2 instance. For details about using a private network configuration, see [Configure Private Network](#configure-private-network).",
+      "Type": "String",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ],
+      "Default": "Yes"
+    },
     "RootVolumeSize": {
-      "Description": "Size in GB of the root volume",
+      "Description": "Size of the root volume, in GiB.",
       "Default": "128",
       "Type": "Number",
       "MinValue": "128",
       "MaxValue": "1024",
-      "ConstraintDescription": "Size must be between 128 and 1024GB"
+      "ConstraintDescription": "Size must be between 128 and 1024 GiB"
     },
     "CustomIamRole": {
-      "Description": "Name of a custom IAM Role to associate with this instance. Specify a role that has the necessary permissions listed in the Permission file in the GitHub repository: https://github.com/mathworks-ref-arch/matlab-on-aws-win/permission.md. If not specified, a predefined role is used.",
+      "Description": "Name of a custom IAM Role to associate with this instance. If not specified, a predefined role is used. If specified, features requiring special permissions will be unavailable (NICE DCV, CloudWatch, IAM Policies, SSM).",
       "Default": "",
       "Type": "String"
     },
@@ -608,13 +641,13 @@
       "ConstraintDescription": "If specified, must be a semicolon (;) delimited list of ARNs (arn:<partition>:iam::<account-id>:policy/<resource-id>)."
     },
     "VPC": {
-      "Description": "ID of an existing VPC in which to deploy this stack",
+      "Description": "ID of an existing VPC to deploy this stack in.",
       "Type": "AWS::EC2::VPC::Id",
       "ConstraintDescription": "Must be the Id of an existing VPC.",
       "AllowedPattern": ".+"
     },
     "Subnet": {
-      "Description": "ID of an existing subnet",
+      "Description": "ID of an existing subnet in the VPC.",
       "Type": "AWS::EC2::Subnet::Id",
       "ConstraintDescription": "Must be the ID of an existing Subnet within the chosen VPC.",
       "AllowedPattern": ".+"
@@ -635,7 +668,7 @@
       ]
     },
     "ClientIPAddress": {
-      "Description": "Comma-separated list of IP address ranges that will be allowed to connect to this instance. Each IP CIDR should be formatted as <ip_address>/<mask>. The mask determines the number of IP addresses to include. A mask of 32 is a single IP address. Example of allowed values: 10.0.0.1/32 or 10.0.0.0/16,192.34.56.78/32. This calculator can be used to build a specific range: https://www.ipaddressguide.com/cidr. You may need to contact your IT administrator to determine which address is appropriate.",
+      "Description": "Comma-separated list of IP address ranges that will be allowed to connect to this instance. Each IP CIDR must have the format <ip_address>/<mask>. The mask determines the number of IP addresses to include. A mask of 32 specifies a single IP address. Examples of allowed values: 10.0.0.1/32 or 10.0.0.0/16,192.34.56.78/32. To build a specific range, you can use this tool: https://www.ipaddressguide.com/cidr. To determine which address is appropriate, contact your IT administrator.",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "189",
@@ -644,26 +677,26 @@
     },
     "Password": {
       "NoEcho": "true",
-      "Description": "Password for the user Administrator. You also need to enter this as an authentication token to access MATLAB on your cloud instance within a browser.",
+      "Description": "Password for the user Administrator. You must also enter this password as an authentication token to access MATLAB in a browser on your cloud instance.",
       "Type": "String",
       "AllowedPattern": "^((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])|(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*])|(?=.*[0-9])(?=.*[A-Z])(?=.*[!@#$%^&*])|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])).{14,72}$",
       "ConstraintDescription": "Your password must contain at least 14 characters, an upper and a lower case character, a digit, and a special character."
     },
     "ConfirmPassword": {
       "NoEcho": "true",
-      "Description": "Confirm Password",
+      "Description": "Confirm Password.",
       "Type": "String",
       "ConstraintDescription": ""
     },
     "LicenseManager": {
-      "Description": "Optional License Manager for MATLAB, specified as a string in the form <port>@<hostname>. If not specified, use online licensing. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws.",
+      "Description": "Optional License Manager for MATLAB, specified as a string of the form <port>@<hostname>. If not specified, online licensing is used instead. If specified, the network license manager (NLM) must be accessible from the specified VPC and subnets. To use the private hostname of the NLM hub instead of the public hostname, specify the security group ID of the NLM hub in the AdditionalSecurityGroup parameter. For more information, see https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws.",
       "Type": "String",
       "Default": "",
       "AllowedPattern": "([0-9]+@[a-zA-Z0-9.\\-]+)?",
-      "ConstraintDescription": "If specified, must be in the form <port>@<hostname>"
+      "ConstraintDescription": "If specified, must be of the form <port>@<hostname>"
     },
     "EnableCloudWatch": {
-      "Description": "Flag indicating whether cloudwatch logging for the MATLAB instance is enabled.",
+      "Description": "Flag specifying whether to enable cloudwatch logging for the MATLAB instance. For private instances, CloudWatch logs might not be updated unless you set up a NAT Gateway or VPC endpoint. For details about private networking, see [Configure Private Network](#configure-private-network).",
       "Type": "String",
       "AllowedValues": [
         "Yes",
@@ -672,7 +705,7 @@
       "Default": "No"
     },
     "AdditionalSecurityGroup": {
-      "Description": "ID of an additional (optional) Security Group for the instances to be placed in. Often the License Manager for MATLAB's Security Group.",
+      "Description": "(Optional) ID of an additional security group to place the instances in. Often the security group of the License Manager for MATLAB.",
       "Type": "String",
       "Default": ""
     },
@@ -720,16 +753,39 @@
     },
     "CustomAmiId": {
       "Default": "",
-      "Description": "ID of a custom Amazon Machine Image (AMI) in the target region (optional). If the build has been customized then the resulting machine image may no longer be compatible with the provided CloudFormation template. Compatability can in some cases be restored by making corresponding modifications to the CloudFormation template. The ID should start with 'ami-'.",
+      "Description": "(Optional) ID of a custom Amazon Machine Image (AMI) in the target region. If the build has been customized then the resulting machine image might no longer be compatible with the provided CloudFormation template. In some cases you can restore compatability by making corresponding modifications to the CloudFormation template. The ID must start with 'ami-'.",
       "Type": "String"
     },
     "OptionalUserCommand": {
-      "Description": "Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command excluding the angle brackets: <[System.Environment]::SetEnvironmentVariable(\"CLOUD\",\"AWS\", \"Machine\");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: <Invoke-WebRequest \"https://www.example.com/script.ps1\" -OutFile script.ps1; .\\script.ps1>. Find the logs at '$Env:ProgramData\\MathWorks\\startup.log'.",
+      "Description": "Provide an optional inline PowerShell command to run on machine launch. For example, to set an environment variable CLOUD=AWS, use this command, excluding the angle brackets: <[System.Environment]::SetEnvironmentVariable(\"CLOUD\",\"AWS\", \"Machine\");>. You can use either double quotes or two single quotes. To run an external script, use this command excluding the angle brackets: <Invoke-WebRequest \"https://www.example.com/script.ps1\" -OutFile script.ps1; .\\script.ps1>. Find the logs at '$Env:ProgramData\\MathWorks\\startup.log'.",
       "Type": "String",
       "Default": ""
     }
   },
   "Rules": {
+    "ElasticIPRequiresPublicIP": {
+      "RuleCondition": {
+        "Fn::Equals": [
+          {
+            "Ref": "EnablePublicIPAddress"
+          },
+          "No"
+        ]
+      },
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Equals": [
+              {
+                "Ref": "UseElasticIP"
+              },
+              "No"
+            ]
+          },
+          "AssertDescription": "Elastic IP cannot be used when Public IP address is disabled."
+        }
+      ]
+    },
     "matchPasswords": {
       "Assertions": [
         {
@@ -796,6 +852,14 @@
     }
   },
   "Conditions": {
+    "UsePublicIp": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnablePublicIPAddress"
+        },
+        "Yes"
+      ]
+    },
     "EnableAutoShutdown": {
       "Fn::Not": [
         {
@@ -879,23 +943,53 @@
   },
   "Outputs": {
     "RDPSSHConnection": {
-      "Description": "Public DNSName of the newly created EC2 instance",
+      "Description": "DNSName of the newly created EC2 instance",
       "Value": {
-        "Fn::Sub": "${MATLABEC2Instance.PublicDnsName}"
+        "Fn::If": [
+          "UsePublicIp",
+          {
+            "Fn::GetAtt": [
+              "MATLABEC2Instance",
+              "PublicDnsName"
+            ]
+          },
+          {
+            "Fn::GetAtt": [
+              "MATLABEC2Instance",
+              "PrivateDnsName"
+            ]
+          }
+        ]
       }
     },
     "NiceDCVConnection": {
       "Condition": "CreateNewRole",
       "Description": "Url of the NICE DCV session running on the EC2 instance",
       "Value": {
-        "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8443/#console"
+        "Fn::If": [
+          "UsePublicIp",
+          {
+            "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8443/#console"
+          },
+          {
+            "Fn::Sub": "https://${MATLABEC2Instance.PrivateDnsName}:8443/#console"
+          }
+        ]
       }
     },
     "BrowserConnection": {
       "Condition": "UseMATLABProxy",
       "Description": "URL to connect to and open MATLAB in a browser.",
       "Value": {
-        "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8123"
+        "Fn::If": [
+          "UsePublicIp",
+          {
+            "Fn::Sub": "https://${MATLABEC2Instance.PublicDnsName}:8123"
+          },
+          {
+            "Fn::Sub": "https://${MATLABEC2Instance.PrivateDnsName}:8123"
+          }
+        ]
       }
     },
     "CloudWatchLogs": {
@@ -941,6 +1035,7 @@
             "VPC",
             "Subnet",
             "AdditionalSecurityGroup",
+            "EnablePublicIPAddress",
             "UseElasticIP"
           ]
         },
@@ -1009,6 +1104,9 @@
         },
         "Subnet": {
           "default": "Subnet"
+        },
+        "EnablePublicIPAddress": {
+          "default": "Choose if a public IP address should be attached to the MATLAB EC2 instance"
         },
         "Password": {
           "default": "Remote password"

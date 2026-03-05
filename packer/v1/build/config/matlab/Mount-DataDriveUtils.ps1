@@ -1,4 +1,9 @@
-# Copyright 2025 The MathWorks, Inc.
+# Copyright 2025-2026 The MathWorks, Inc.
+
+# Since the methods defined in this script use the aws cli, refresh PATH to ensure
+# the tool is found when needed
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
 function Get-IMDSV2Token {
     <#
     .SYNOPSIS

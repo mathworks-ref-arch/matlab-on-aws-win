@@ -2,7 +2,7 @@
 
 // Use this Packer configuration file to build AMI with R2025a MATLAB installed.
 // For more information on these variables, see /packer/build-matlab-ami.pkr.hcl.
-RELEASE  = "R2025a"
+RELEASE = "R2025a"
 // Microsoft Windows Server 2022 Base (64-bit (x86))
 BASE_AMI_NAME = "Windows_Server-2022-English-Full-Base-*"
 STARTUP_SCRIPTS = [

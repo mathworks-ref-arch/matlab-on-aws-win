@@ -10,7 +10,7 @@
     Invoke-Sysprep
 
 .NOTES
-    Copyright 2023-2024 The MathWorks, Inc.
+    Copyright 2023-2026 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 function Invoke-Sysprep {
@@ -20,8 +20,9 @@ function Invoke-Sysprep {
 
     if ($WindowsVersion -eq 'Microsoft Windows Server 2022 Datacenter') {
         # Ec2launch v2 for Windows Server 2022
-        & "$Env:ProgramFiles\Amazon\EC2Launch\ec2launch.exe" reset -c -b
-        & "$Env:ProgramFiles\Amazon\EC2Launch\ec2launch.exe" sysprep -c -b
+        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2launch-v2-settings.html#ec2launch-v2-cli
+        & "$env:ProgramFiles\Amazon\EC2Launch\ec2launch.exe" reset --clean
+        & "$env:ProgramFiles\Amazon\EC2Launch\ec2launch.exe" sysprep --clean
     }
     elseif ($WindowsVersion -eq 'Microsoft Windows Server 2019 Datacenter') {
         # Ec2launch v1 for Windows Server 2019

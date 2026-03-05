@@ -1,4 +1,4 @@
-# Copyright 2024-2025 The MathWorks, Inc.
+# Copyright 2024-2026 The MathWorks, Inc.
 
 packer {
   required_plugins {
@@ -20,7 +20,7 @@ variable "RELEASE" {
   description = "Target MATLAB release to install in the machine image, must start with \"R\"."
 
   validation {
-    condition     = can(regex("^R20[0-9][0-9](a|b)(U[0-9])?$", var.RELEASE))
+    condition     = can(regex("^R20[0-9][0-9](a|b)$", var.RELEASE))
     error_message = "The RELEASE value must be a valid MATLAB release, starting with \"R\"."
   }
 }
@@ -33,7 +33,7 @@ variable "PRODUCTS" {
 
 variable "SPKGS" {
   type        = string
-  default     = "Deep_Learning_Toolbox_Model_for_AlexNet_Network Deep_Learning_Toolbox_Model_for_EfficientNet-b0_Network Deep_Learning_Toolbox_Model_for_GoogLeNet_Network Deep_Learning_Toolbox_Model_for_ResNet-101_Network Deep_Learning_Toolbox_Model_for_ResNet-18_Network Deep_Learning_Toolbox_Model_for_ResNet-50_Network Deep_Learning_Toolbox_Model_for_Inception-ResNet-v2_Network Deep_Learning_Toolbox_Model_for_Inception-v3_Network Deep_Learning_Toolbox_Model_for_DenseNet-201_Network Deep_Learning_Toolbox_Model_for_Xception_Network Deep_Learning_Toolbox_Model_for_MobileNet-v2_Network Deep_Learning_Toolbox_Model_for_Places365-GoogLeNet_Network Deep_Learning_Toolbox_Model_for_NASNet-Large_Network Deep_Learning_Toolbox_Model_for_NASNet-Mobile_Network Deep_Learning_Toolbox_Model_for_ShuffleNet_Network Deep_Learning_Toolbox_Model_for_DarkNet-19_Network Deep_Learning_Toolbox_Model_for_DarkNet-53_Network Deep_Learning_Toolbox_Model_for_VGG-16_Network Deep_Learning_Toolbox_Model_for_VGG-19_Network"  
+  default     = "Deep_Learning_Toolbox_Model_for_AlexNet_Network Deep_Learning_Toolbox_Model_for_EfficientNet-b0_Network Deep_Learning_Toolbox_Model_for_GoogLeNet_Network Deep_Learning_Toolbox_Model_for_ResNet-101_Network Deep_Learning_Toolbox_Model_for_ResNet-18_Network Deep_Learning_Toolbox_Model_for_ResNet-50_Network Deep_Learning_Toolbox_Model_for_Inception-ResNet-v2_Network Deep_Learning_Toolbox_Model_for_Inception-v3_Network Deep_Learning_Toolbox_Model_for_DenseNet-201_Network Deep_Learning_Toolbox_Model_for_Xception_Network Deep_Learning_Toolbox_Model_for_MobileNet-v2_Network Deep_Learning_Toolbox_Model_for_Places365-GoogLeNet_Network Deep_Learning_Toolbox_Model_for_NASNet-Large_Network Deep_Learning_Toolbox_Model_for_NASNet-Mobile_Network Deep_Learning_Toolbox_Model_for_ShuffleNet_Network Deep_Learning_Toolbox_Model_for_DarkNet-19_Network Deep_Learning_Toolbox_Model_for_DarkNet-53_Network Deep_Learning_Toolbox_Model_for_VGG-16_Network Deep_Learning_Toolbox_Model_for_VGG-19_Network"
   description = "Target support packages to install in the machine image."
 }
 
@@ -155,11 +155,11 @@ variable "INSTANCE_TAGS" {
 variable "AMI_TAGS" {
   type = map(string)
   default = {
-    Name     = "Packer Build"
-    Build    = "MATLAB"
-    Type     = "matlab-on-aws"
-    Platform = "Windows"
-    Base_AMI_ID = "{{ .SourceAMI }}"
+    Name          = "Packer Build"
+    Build         = "MATLAB"
+    Type          = "matlab-on-aws"
+    Platform      = "Windows"
+    Base_AMI_ID   = "{{ .SourceAMI }}"
     Base_AMI_Name = "{{ .SourceAMIName }}"
   }
   description = "The tags Packer adds to the resultant machine image."
@@ -177,14 +177,10 @@ variable "PACKER_ADMIN_USERNAME" {
   description = "Username for the build instance."
 }
 
-variable "PACKER_ADMIN_PASSWORD" {
+variable "SECURITY_GROUP_ID" {
   type        = string
-  description = "Password for the build instance. Must be provided as a build argument. Must satisfy password complexity requirements of base operating system."
-  sensitive = true
-  validation {
-    condition     = length(var.PACKER_ADMIN_PASSWORD) > 11
-    error_message = "Password must be at least 12 characters long."
-  }
+  default     = ""
+  description = "(Optional) The target security group to be used by Packer. If not specified, Packer will create a temporary security group."
 }
 
 variable "AWS_INSTANCE_PROFILE" {
@@ -199,10 +195,35 @@ variable "MATLAB_PROXY_VERSION" {
   description = "The matlab-proxy version to use."
 }
 
-variable "WINRM_PORT" {
-  type  = string
-  default = "5986"
-  description = "The WinRM port to use for connecting to the Windows instance during the build process."
+variable "MSA_URL" {
+  type        = string
+  description = "URL pointing to a valid MATLAB Startup Accelerator file. If left unset, a default URL will be constructed based on the RELEASE variable."
+  default     = null
+}
+
+# Optional parameters to setup a SSH Bastion for Packer Build
+variable "SSH_BASTION_HOST" {
+  type        = string
+  default     = ""
+  description = "(Optional) A bastion host to use for the actual SSH connection."
+}
+
+variable "SSH_INTERFACE" {
+  type         = string
+  default      = "public_ip"
+  description  = "Specifies the type of network interface address used by Packer for SSH connections. Acceptable values are 'public_ip', 'private_ip', 'public_dns', or 'private_dns'."
+}
+
+variable "SSH_BASTION_USERNAME" {
+  type        = string
+  default     = ""
+  description = "(Optional) The username to connect to the bastion host."
+}
+
+variable "SSH_BASTION_PRIVATE_KEY_FILE" {
+  type        = string
+  default     = ""
+  description = "(Optional) Path to a PEM encoded private key file to use to authenticate with the bastion host."
 }
 
 # Set up local variables used by provisioners.
@@ -211,9 +232,11 @@ locals {
   build_scripts         = [for s in var.BUILD_SCRIPTS : format("build/%s", s)]
   startup_scripts       = [for s in var.STARTUP_SCRIPTS : format("startup/%s", s)]
   runtime_scripts       = [for s in var.RUNTIME_SCRIPTS : format("runtime/%s", s)]
-  packer_admin_username = "${var.PACKER_ADMIN_USERNAME}"
-  packer_admin_password = "${var.PACKER_ADMIN_PASSWORD}"
-  winrm_port            = "${var.WINRM_PORT}"
+  use_temp_sg_rule = var.SECURITY_GROUP_ID == "" ? true : false
+  # This local variable decides which URL to use.
+  # If var.MSA_URL is not null (meaning the user provided an override), use that value.
+  # Otherwise, construct the URL using var.RELEASE.
+  effective_msa_url = var.MSA_URL != null ? var.MSA_URL : "https://raw.githubusercontent.com/mathworks-ref-arch/iac-building-blocks/refs/heads/main/common/artifacts/msa/${var.RELEASE}/Windows/msa.ini"
 }
 
 # Configure the EC2 instance that is used to build the machine image.
@@ -223,7 +246,39 @@ source "amazon-ebs" "AMI_Builder" {
     delay_seconds = 60
     max_attempts  = 240
   }
-  communicator  = "winrm"
+
+  # Communicator setup
+  ssh_username                 = "${var.PACKER_ADMIN_USERNAME}"
+  ssh_interface                = "${var.SSH_INTERFACE}"
+  ssh_timeout                  = "10m" 
+
+  # Optional bastion host configuration
+  ssh_bastion_host             = "${var.SSH_BASTION_HOST}"
+  ssh_bastion_username         = "${var.SSH_BASTION_USERNAME}"
+  ssh_bastion_private_key_file = "${var.SSH_BASTION_PRIVATE_KEY_FILE}"
+
+  # Networking configuration
+  vpc_id                       = "${var.VPC_ID}"
+  subnet_id                    = "${var.SUBNET_ID}"
+
+  # If VPC/subnet not set, Packer will choose VPC and Subnet according to these filters
+  vpc_filter {
+    filters = {
+      isDefault = true
+    }
+  }
+  subnet_filter {
+    most_free = true
+    random    = false
+  }
+
+  # Optional: Provide ID of an existing security group
+  security_group_id                         = "${var.SECURITY_GROUP_ID}"
+
+  # If no security group provided, allow Packer to create a temporary security group
+  # that allows SSH access from the host's public IP
+  temporary_security_group_source_public_ip = "${local.use_temp_sg_rule}"
+
   instance_type = "g4dn.xlarge"
   launch_block_device_mappings {
     delete_on_termination = true
@@ -231,34 +286,23 @@ source "amazon-ebs" "AMI_Builder" {
     volume_size           = 128
     volume_type           = "gp2"
   }
-  region                  = "us-east-1"
+  region = "us-east-1"
   source_ami_filter {
     filters = {
       "virtualization-type" = "hvm"
-      "name" = "${var.BASE_AMI_NAME}"
-      "root-device-type" = "ebs"
-    } 
-    owners = ["801119661308"] # Owner ID associated with Windows Server AMIs
+      "name"                = "${var.BASE_AMI_NAME}"
+      "root-device-type"    = "ebs"
+    }
+    owners      = ["801119661308"] # Owner ID associated with Windows Server AMIs
     most_recent = true
   }
-  subnet_id                                 = "${var.SUBNET_ID}"
-  run_tags                                  = "${var.INSTANCE_TAGS}"
-  tags                                      = "${var.AMI_TAGS}"
-  temporary_security_group_source_public_ip = true
-  user_data = templatefile("./build/config/packer/bootstrap_win.pkrtpl.hcl", { winrm_username = local.packer_admin_username, winrm_password = local.packer_admin_password, winrm_port = local.winrm_port })
-  vpc_id                                    = "${var.VPC_ID}"
-  winrm_username                            = "${local.packer_admin_username}"
-  winrm_password                            = "${local.packer_admin_password}"
-  winrm_port                                = "${local.winrm_port}"
+  run_tags = "${var.INSTANCE_TAGS}"
+  tags     = "${var.AMI_TAGS}"
 
-  # Enables HTTPS for the WinRM communication
-  winrm_use_ssl                             = true
-  
-  # Since we are using a self-signed certificate for the WinRM HTTPs listener, 
-  # this setting tells Packer client to skip the certificate validation
-  winrm_insecure                            = true
+  # Inject SSH setup script as user-data
+  user_data  = templatefile("build/config/packer/enable_openssh.pkrtpl.hcl", {})
 
-  iam_instance_profile                      = "${var.AWS_INSTANCE_PROFILE}"
+  iam_instance_profile = "${var.AWS_INSTANCE_PROFILE}"
   # The `Get-NVidiaGridDrivers` function involves retrieving files from an AWS-owned S3 bucket, which needs S3 permissions for the packer EC2.
   # If you are adding/updating scripts that require AWS permissions from inside the Packer EC2 instance, you can add those permissions here.
   temporary_iam_instance_profile_policy_document {
@@ -284,22 +328,26 @@ build {
   provisioner "file" {
     destination = "C:/Windows/Temp/"
     source      = "build/config"
+    max_retries       = 3
+  }
+
+  provisioner "powershell" {
+    inline = [
+      "New-Item -Path 'C:/Windows/Temp/startup' -ItemType Directory -Force",
+      "New-Item -Path 'C:/Windows/Temp/runtime' -ItemType Directory -Force"
+    ]
   }
 
   provisioner "file" {
     destination = "C:/Windows/Temp/startup/"
     sources     = "${local.startup_scripts}"
+    max_retries       = 3
   }
 
   provisioner "file" {
     destination = "C:/Windows/Temp/runtime/"
     sources     = "${local.runtime_scripts}"
-  }
-
-  provisioner "powershell" {
-    elevated_user     = "${local.packer_admin_username}"
-    elevated_password = "${local.packer_admin_password}"
-    scripts           = ["build/Enable-OpenSSh.ps1"]
+    max_retries       = 3
   }
 
   provisioner "powershell" {
@@ -313,9 +361,11 @@ build {
       "PYTHON_INSTALLER_URL=${var.PYTHON_INSTALLER_URL}",
       "MATLAB_SOURCE_URL=${var.MATLAB_SOURCE_URL}",
       "SPKG_SOURCE_URL=${var.SPKG_SOURCE_URL}",
+      "MSA_URL=${local.effective_msa_url}",
       "MATLAB_PROXY_VERSION=${var.MATLAB_PROXY_VERSION}"
     ]
     scripts = "${local.build_scripts}"
+    pause_before      = "2m"
   }
 
   provisioner "windows-restart" {
@@ -328,6 +378,7 @@ build {
       "build/Remove-TemporaryFiles.ps1",
       "build/Invoke-Sysprep.ps1"
       ]
+    pause_before      = "1m"
   }
 
   post-processor "manifest" {

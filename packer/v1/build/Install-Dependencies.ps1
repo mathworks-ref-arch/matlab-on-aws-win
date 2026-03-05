@@ -12,7 +12,7 @@
     The URL for the NICE DCV installer.
 
 .NOTES
-    Copyright 2023-2024 The MathWorks, Inc.
+    Copyright 2023-2025 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -169,6 +169,63 @@ function Install-SSMAgent {
     Write-Output 'Done with Install-SSMAgent.'
 }
 
+function Get-EdgeEnterpriseUrl {
+    # Queries the Microsoft Edge Update API to get the latest Stable Enterprise MSI URL.
+
+    # Endpoint: https://edgeupdates.microsoft.com/api/products?view=enterprise
+    # Schema Structure (Simplified for maintainability):
+    # [
+    #   {
+    #     "Product": "Stable",
+    #     "Releases": [
+    #       {
+    #         "ProductVersion": "121.0.2277.83",
+    #         "Platform": "Windows",
+    #         "Architecture": "x64",
+    #         "Artifacts": [
+    #           {
+    #             "Location": "https://msedge.sf.dl.../MicrosoftEdgeEnterpriseX64.msi",
+    #             "ArtifactName": "MicrosoftEdgeEnterpriseX64.msi",
+    #             "Hash": "..."
+    #           }
+    #         ]
+    #       }
+    #     ]
+    #   }
+    # ]
+    # NOTE: "Artifacts" is an array. We access index [0] to get the MSI location.
+    
+    Write-Host 'Querying Microsoft API for latest Edge Enterprise MSI...'
+
+    try {
+        $EdgeApiUrl = "https://edgeupdates.microsoft.com/api/products?view=enterprise"
+        $EdgeInfo = Invoke-RestMethod -Uri $EdgeApiUrl -Method Get
+        
+        # Filter for Stable, x64, Windows
+        $StableChannel = $EdgeInfo | Where-Object { $_.Product -eq 'Stable' }
+        $Release = $StableChannel.Releases | Where-Object { $_.Architecture -eq 'x64' -and $_.Platform -eq 'Windows' } | Select-Object -First 1
+
+        if (-not $Release) {
+            Throw "Could not find a valid Edge Release from Microsoft API."
+        }
+
+        $DownloadUrl = $Release.Artifacts[0].Location
+        $ProductVersion = $Release.ProductVersion
+
+        if ([string]::IsNullOrWhiteSpace($DownloadUrl)) {
+             Throw "Found release version $ProductVersion but the Download URL was empty. API Schema might have changed."
+        }
+
+        Write-Host "Found Edge Version: $ProductVersion"
+        Write-Host "Download URL: $DownloadUrl"
+
+        return $DownloadUrl
+    }
+    catch {
+        Throw "Failed to retrieve dynamic URL from Microsoft API. Details: $_"
+    }
+}
+
 function Install-EdgeBrowser {
     Write-Output 'Starting Install-EdgeBrowser...'
 
@@ -178,17 +235,39 @@ function Install-EdgeBrowser {
     Write-Output 'Waiting for 5 minutes to resolve Global Mutex Lock issue ...'
     Start-Sleep -s 300
 
+    try {
+        $msiDownloadURL = Get-EdgeEnterpriseUrl
+    }
+    catch {
+        Write-Error $_
+        return
+    }
+
     Write-Output 'Downloading Edge browser msi file ...'
     $InstallerFile = 'C:\Windows\Temp\MicrosoftEdgeEnterpriseX64.msi'
-    # To locate the URL, open a Chrome browser and go to the Microsoft webpage dedicated to downloading the Edge browser.
-    # https://www.microsoft.com/en-us/edge/business/download?form=MA13FJ
-    # Select the "Download for Windows 64-bit" option. As the file begins to download, access your
-    # browser's "Full download history" (the name of this feature may vary across browsers, but we're using Chrome as an example).
-    # Identify the file currently downloading, right-click on its link, and choose "Copy link address."
-    (New-Object System.Net.WebClient).DownloadFile('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/246e4bf2-8ad8-446b-b247-6fa0390a105e/MicrosoftEdgeEnterpriseX64.msi', $InstallerFile)
+    
+    try {
+        (New-Object System.Net.WebClient).DownloadFile($msiDownloadURL, $InstallerFile)
+    }
+    catch {
+        Write-Error "Failed to download MSI file. Error: $_"
+        return
+    }
 
     Write-Output 'Installing Edge browser ...'
-    Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Windows\Temp\MicrosoftEdgeEnterpriseX64.msi /quiet /norestart /l*v C:\Windows\Temp\edge_install_msi.log'
+    $LogFile = 'C:\Windows\Temp\edge_install_msi.log'
+    
+    $Process = Start-Process msiexec.exe -Wait -PassThru -ArgumentList "/i $InstallerFile /quiet /norestart /l*v $LogFile"
+
+    if ($Process.ExitCode -eq 0 -Or $Process.ExitCode -eq 3010) {
+        # exit code 3010 captures a successful install that requests a restart
+        # for more information on exit codes for msiexec, please refer to this page: 
+        # https://learn.microsoft.com/en-us/windows/win32/msi/error-codes
+        Write-Output 'Edge installed successfully.'
+    }
+    else {
+        Write-Error "Edge installation failed with exit code $($Process.ExitCode). Check log at $LogFile"
+    }
 
     Write-Output 'Done with Install-EdgeBrowser.'
 }

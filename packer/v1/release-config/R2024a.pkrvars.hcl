@@ -1,8 +1,8 @@
-# Copyright 2024 The MathWorks, Inc.
+# Copyright 2024-2025 The MathWorks, Inc.
 
 // Use this Packer configuration file to build AMI with R2024a MATLAB installed.
 // For more information on these variables, see /packer/build-matlab-ami.pkr.hcl.
-RELEASE  = "R2024a"
+RELEASE = "R2024a"
 // Microsoft Windows Server 2022 Base (64-bit (x86))
 BASE_AMI_NAME = "Windows_Server-2022-English-Full-Base-*"
 STARTUP_SCRIPTS = [

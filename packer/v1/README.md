@@ -37,10 +37,6 @@ packer init build-matlab-ami.pkr.hcl
 ```
 
 Launch the Packer build with the default settings.
-Set the `PACKER_ADMIN_PASSWORD` as a command line parameter.
-```bash
-packer build -var="PACKER_ADMIN_PASSWORD=<password>" build-matlab-ami.pkr.hcl
-```
 Packer writes its output, including the ID of the generated machine image, to a `packer_manifest.json` file at the end of the build.
 To use the built image with a MathWorks CloudFormation template, see [Deploy Machine Image](#deploy-machine-image).
 
@@ -55,7 +51,6 @@ supports these build-time variables.
 | Argument Name | Default Value | Description |
 |---|---|---|
 | [PRODUCTS](#customize-products-to-install)| MATLAB and all available toolboxes | Products to install, specified as a list of product names separated by spaces. For example, `MATLAB Simulink Deep_Learning_Toolbox Parallel_Computing_Toolbox`.<br/>If no products are specified, the Packer build will install MATLAB with all available toolboxes. For more information, see [MATLAB Package Manager](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md).|
-| PACKER_ADMIN_PASSWORD | *unset*, must be set as a build argument. | Password used by Packer to connect to the build instance. Must be at least 12 characters long, and be a combination of uppercase letters, lowercase letters, numbers, and symbols. |
 | BASE_AMI | Default AMI ID refers to Windows_Server-2022-English-Full-Base. | The base AMI upon which the image is built, defaults to the Windows Server 2022 image provided by Microsoft. |
 | VPC_ID | *unset* | VPC to assign to the Packer build instance. If no VPC is specified, the default VPC will be used.|
 | SUBNET_ID | *unset* | Subnet to assign to the Packer build instance. If no subnet is specified, the subnet with the most free IPv4 addresses will be used.|
@@ -73,7 +68,7 @@ Use the Packer build-time variable `PRODUCTS` to specify the list of products yo
 
 For example, install the latest version of MATLAB and Deep Learning Toolbox&trade;.
 ```bash
-packer build -var="PRODUCTS=MATLAB Deep_Learning_Toolbox" -var="PACKER_ADMIN_PASSWORD=<password>" build-matlab-ami.pkr.hcl
+packer build -var="PRODUCTS=MATLAB Deep_Learning_Toolbox" build-matlab-ami.pkr.hcl
 ```
 
 #### **Customize MATLAB Release to Install**
@@ -82,11 +77,11 @@ These are available for MATLAB R2020b and later.
 
 For example, install MATLAB R2020b and all available toolboxes.
 ```bash
-packer build -var-file="release-config\R2020b.pkrvars.hcl" -var="PACKER_ADMIN_PASSWORD=<password>" build-matlab-ami.pkr.hcl
+packer build -var-file="release-config\R2020b.pkrvars.hcl" build-matlab-ami.pkr.hcl
 ```
 Command line arguments can also be combined. For example, install MATLAB R2020b and the Parallel Computing Toolbox&trade; only.
 ```bash
-packer build -var-file="release-config\R2020b.pkrvars.hcl" -var="PRODUCTS=MATLAB Parallel_Computing_Toolbox" -var="PACKER_ADMIN_PASSWORD=<password>" build-matlab-ami.pkr.hcl
+packer build -var-file="release-config\R2020b.pkrvars.hcl" -var="PRODUCTS=MATLAB Parallel_Computing_Toolbox" build-matlab-ami.pkr.hcl
 ```
 Launch the customized image using the corresponding CloudFormation Template.
 For instructions on how to use CloudFormation Templates, see the Deployment Steps
@@ -106,7 +101,7 @@ folder corresponding to the desired release.
 
 Save the variable definition file and include it in the Packer build command.
 ```bash
-packer build -var-file="custom-variables.pkrvars.hcl" -var="PACKER_ADMIN_PASSWORD=<password>" build-matlab-ami.pkr.hcl
+packer build -var-file="custom-variables.pkrvars.hcl" build-matlab-ami.pkr.hcl
 ```
 
 ### **Installation Scripts**
@@ -185,6 +180,6 @@ If you require assistance or have a request for additional features or capabilit
 
 ----
 
-Copyright 2024 The MathWorks, Inc.
+Copyright 2024-2026 The MathWorks, Inc.
 
 ----
