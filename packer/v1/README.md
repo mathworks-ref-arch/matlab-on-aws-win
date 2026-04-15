@@ -14,7 +14,7 @@ When you launch a MATLAB instance from your custom image, you might experience a
 
 ## **Requirements**
 Before starting, you will need:
-* A valid Packer installation later than 1.7.0. For more information, see [Install Packer](https://developer.hashicorp.com/packer/install).
+* A valid Packer installation of version 1.15.0 or later. For more information, see [Install Packer](https://developer.hashicorp.com/packer/install).
 * Amazon Web Services (AWS&reg;) credentials with sufficient permission. For more information, see [Packer Authentication](https://developer.hashicorp.com/packer/integrations/hashicorp/amazon#authentication).
 
 ## **Costs**
