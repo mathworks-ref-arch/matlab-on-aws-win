@@ -3,58 +3,58 @@
   "Mappings": {
     "RegionMap": {
       "us-east-1": {
-        "AMI": "ami-05a223b0d1e037237"
+        "AMI": "ami-09e650f0e7a63af43"
       },
       "us-east-2": {
-        "AMI": "ami-02e3e9ab622a1cd11"
+        "AMI": "ami-09346e06f697644af"
       },
       "us-west-1": {
-        "AMI": "ami-015fb851096e7787c"
+        "AMI": "ami-0cf64813c3305c157"
       },
       "us-west-2": {
-        "AMI": "ami-01533c881b17d9000"
+        "AMI": "ami-02110c20a3b0220c8"
       },
       "ca-central-1": {
-        "AMI": "ami-03b354bf8d16353eb"
+        "AMI": "ami-0987ef4d711d840cc"
       },
       "eu-central-1": {
-        "AMI": "ami-0e6647f2b8d942de0"
+        "AMI": "ami-0fe611bdcda50a454"
       },
       "eu-west-1": {
-        "AMI": "ami-0ae1d24dbb1d0a827"
+        "AMI": "ami-08b66e10f666ade9e"
       },
       "eu-west-2": {
-        "AMI": "ami-0ad258b2884eac1d4"
+        "AMI": "ami-0e206267c52ae5e2c"
       },
       "eu-west-3": {
-        "AMI": "ami-08784e3ee5235404c"
+        "AMI": "ami-0a8446f8aadad38cf"
       },
       "eu-north-1": {
-        "AMI": "ami-0ffc715d4116dfbb6"
+        "AMI": "ami-047384fe38a9fa7ac"
       },
       "sa-east-1": {
-        "AMI": "ami-06806aea5621eeb44"
+        "AMI": "ami-0d5a7faa6c738b054"
       },
       "me-south-1": {
         "AMI": "Enter the ID of a custom AMI in this region."
       },
       "ap-east-1": {
-        "AMI": "ami-0a1fdd7d96be61333"
+        "AMI": "ami-0603e2d01e8b25b3f"
       },
       "ap-south-1": {
-        "AMI": "ami-04fb70552afa45a20"
+        "AMI": "ami-03a59b04dd08d8a70"
       },
       "ap-northeast-1": {
-        "AMI": "ami-0329e368943ddf58a"
+        "AMI": "ami-054517fe2fc010792"
       },
       "ap-northeast-2": {
-        "AMI": "ami-02c3ef8be0dffe070"
+        "AMI": "ami-01ae104f6529a687e"
       },
       "ap-southeast-1": {
-        "AMI": "ami-0ef4f71d2c46a14e8"
+        "AMI": "ami-0cd8338b7e02ad9a2"
       },
       "ap-southeast-2": {
-        "AMI": "ami-0fbf80560f2a29b11"
+        "AMI": "ami-0460f51b091ea7ec9"
       },
       "us-gov-west-1": {
         "AMI": "Enter the ID of a custom AMI in this region."
@@ -370,7 +370,7 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Delete",
       "Properties": {
-        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/ec2-shutdown-lambda/v1/0/1/ec2-shutdown-lambda.yml",
+        "TemplateURL": "https://mathworks-reference-architectures-templates.s3.amazonaws.com/ec2-shutdown-lambda/v1/1/1/ec2-shutdown-lambda.yml",
         "Parameters": {
           "EC2InstanceId": {
             "Ref": "MATLABEC2Instance"

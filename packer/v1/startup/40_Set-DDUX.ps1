@@ -11,7 +11,7 @@
     Set-DDUX
 
 .NOTES
-    Copyright 2020-2025 The MathWorks, Inc.
+    Copyright 2020-2026 The MathWorks, Inc.
 #>
 function Test-AWSEndpoint {
     param(
@@ -22,10 +22,17 @@ function Test-AWSEndpoint {
     )
 
     try {
-        $Response = Test-NetConnection -ComputerName $Endpoint -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue -TimeoutSeconds $TimeoutSeconds
-        return [bool]$Response.TcpTestSucceeded
+        $TcpClient = New-Object System.Net.Sockets.TcpClient
+        $Connection = $TcpClient.ConnectAsync($Endpoint, $Port)
+        $Completed = $Connection.Wait($TimeoutSeconds * 1000)
+        if ($Completed -and -not $Connection.IsFaulted) {
+            return $true
+        }
+        return $false
     } catch {
         Write-Host "Error connecting to $Endpoint : $($_.Exception.Message)"
+    } finally {
+        if ($TcpClient) { $TcpClient.Dispose() }
     }
     
     return $false
