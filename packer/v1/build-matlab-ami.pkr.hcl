@@ -16,7 +16,7 @@ packer {
 
 variable "RELEASE" {
   type        = string
-  default     = "R2026a"
+  default     = "R2026b"
   description = "Target MATLAB release to install in the machine image, must start with \"R\"."
 
   validation {
@@ -27,7 +27,7 @@ variable "RELEASE" {
 
 variable "PRODUCTS" {
   type        = string
-  default     = "5G_Toolbox AUTOSAR_Blockset Aerospace_Blockset Aerospace_Toolbox Antenna_Toolbox Audio_Toolbox Automated_Driving_Toolbox Bioinformatics_Toolbox Bluetooth_Toolbox C2000_Microcontroller_Blockset Communications_Toolbox Computer_Vision_Toolbox Control_System_Toolbox Curve_Fitting_Toolbox DDS_Blockset DSP_HDL_Toolbox DSP_System_Toolbox Data_Acquisition_Toolbox Database_Toolbox Datafeed_Toolbox Deep_Learning_HDL_Toolbox Deep_Learning_Toolbox Econometrics_Toolbox Embedded_Coder Financial_Instruments_Toolbox Financial_Toolbox Fixed-Point_Designer Fuzzy_Logic_Toolbox GPU_Coder Global_Optimization_Toolbox HDL_Coder HDL_Verifier Image_Acquisition_Toolbox Image_Processing_Toolbox Industrial_Communication_Toolbox Instrument_Control_Toolbox LTE_Toolbox Lidar_Toolbox MATLAB MATLAB_Coder MATLAB_Compiler MATLAB_Compiler_SDK MATLAB_Report_Generator MATLAB_Test Mapping_Toolbox Medical_Imaging_Toolbox Mixed-Signal_Blockset Model_Predictive_Control_Toolbox Model-Based_Calibration_Toolbox Motor_Control_Blockset Navigation_Toolbox Optimization_Toolbox Parallel_Computing_Toolbox Partial_Differential_Equation_Toolbox Phased_Array_System_Toolbox Powertrain_Blockset Predictive_Maintenance_Toolbox Raspberry_Pi_Blockset RF_Blockset RF_PCB_Toolbox RF_Toolbox ROS_Toolbox Radar_Toolbox Reinforcement_Learning_Toolbox Requirements_Toolbox Risk_Management_Toolbox Robotics_System_Toolbox Robust_Control_Toolbox STM32_Microcontroller_Blockset Satellite_Communications_Toolbox Sensor_Fusion_and_Tracking_Toolbox SerDes_Toolbox Signal_Integrity_Toolbox Signal_Processing_Toolbox SimBiology SimEvents Simscape Simscape_Battery Simscape_Driveline Simscape_Electrical Simscape_Fluids Simscape_Multibody Simulink Simulink_3D_Animation Simulink_Check Simulink_Coder Simulink_Compiler Simulink_Control_Design Simulink_Coverage Simulink_Design_Optimization Simulink_Design_Verifier Simulink_Desktop_Real-Time Simulink_FMU_Builder Simulink_Fault_Analyzer Simulink_PLC_Coder Simulink_Real-Time Simulink_Report_Generator Simulink_Test SoC_Blockset Spreadsheet_Link Stateflow Statistics_and_Machine_Learning_Toolbox Symbolic_Math_Toolbox System_Composer System_Identification_Toolbox Text_Analytics_Toolbox UAV_Toolbox Vehicle_Dynamics_Blockset Vehicle_Network_Toolbox Vision_HDL_Toolbox WLAN_Toolbox Wavelet_Toolbox Wireless_HDL_Toolbox Wireless_Network_Toolbox Wireless_Testbench"
+  default     = "5G_Toolbox AUTOSAR_Blockset Aerospace_Blockset Aerospace_Toolbox Antenna_Toolbox Audio_Toolbox Automated_Driving_Toolbox Bioinformatics_Toolbox Bluetooth_Toolbox C2000_Microcontroller_Blockset Communications_Toolbox Computer_Vision_Toolbox Control_System_Toolbox Curve_Fitting_Toolbox DDS_Blockset DO_Qualification_Kit DSP_HDL_Toolbox DSP_System_Toolbox Data_Acquisition_Toolbox Database_Toolbox Datafeed_Toolbox Deep_Learning_HDL_Toolbox Deep_Learning_Toolbox Econometrics_Toolbox Embedded_Coder Financial_Instruments_Toolbox Financial_Toolbox Fixed-Point_Designer Fuzzy_Logic_Toolbox GPU_Coder Global_Optimization_Toolbox HDL_Coder HDL_Verifier IEC_Certification_Kit Image_Acquisition_Toolbox Image_Processing_Toolbox Industrial_Communication_Toolbox Instrument_Control_Toolbox LTE_Toolbox MATLAB MATLAB_Coder MATLAB_Compiler MATLAB_Compiler_SDK MATLAB_Copilot MATLAB_Parallel_Server MATLAB_Production_Server MATLAB_Report_Generator MATLAB_Test MATLAB_Web_App_Server Mapping_Toolbox Medical_Imaging_Toolbox Mixed-Signal_Blockset Model_Predictive_Control_Toolbox Model-Based_Calibration_Toolbox Motor_Control_Blockset Navigation_Toolbox Optimization_Toolbox Parallel_Computing_Toolbox Partial_Differential_Equation_Toolbox Phased_Array_System_Toolbox Point_Cloud_Toolbox Polyspace_Bug_Finder Polyspace_Bug_Finder_Server Polyspace_Code_Prover Polyspace_Code_Prover_Server Polyspace_Test Polyspace_Test_Server Polyspace_as_You_Code Powertrain_Blockset Predictive_Maintenance_Toolbox RF_Blockset RF_PCB_Toolbox RF_Toolbox ROS_Toolbox Radar_Toolbox Raspberry_Pi_Blockset Reinforcement_Learning_Toolbox Requirements_Toolbox Risk_Management_Toolbox Robotics_System_Toolbox Robust_Control_Toolbox STM32_Microcontroller_Blockset Satellite_Communications_Toolbox Sensor_Fusion_and_Tracking_Toolbox SerDes_Toolbox Signal_Integrity_Toolbox Signal_Processing_Toolbox SimBiology SimEvents Simscape Simscape_Battery Simscape_Driveline Simscape_Electrical Simscape_Fluids Simscape_Multibody Simulink Simulink_3D_Animation Simulink_Check Simulink_Code_Inspector Simulink_Coder Simulink_Compiler Simulink_Control_Design Simulink_Copilot Simulink_Coverage Simulink_Design_Optimization Simulink_Design_Verifier Simulink_Desktop_Real-Time Simulink_FMU_Builder Simulink_Fault_Analyzer Simulink_PLC_Coder Simulink_Real-Time Simulink_Report_Generator Simulink_Test Simulink_Variant_Manager SoC_Blockset Spreadsheet_Link Stateflow Statistics_and_Machine_Learning_Toolbox Symbolic_Math_Toolbox System_Composer System_Identification_Toolbox Text_Analytics_Toolbox UAV_Toolbox Vehicle_Dynamics_Blockset Vehicle_Network_Toolbox Vision_HDL_Toolbox Visual_Inspection_Toolbox WLAN_Toolbox Wavelet_Toolbox Wireless_HDL_Toolbox Wireless_Network_Toolbox Wireless_Testbench"
   description = "Target products to install in the machine image, e.g. MATLAB SIMULINK."
 }
 
@@ -39,8 +39,8 @@ variable "SPKGS" {
 
 variable "BASE_AMI_NAME" {
   type        = string
-  default     = "Windows_Server-2022-English-Full-Base-*"
-  description = "Default AMI name refers to the Windows Server 2022 image provided by Microsoft."
+  default     = "Windows_Server-2025-English-Full-Base-*"
+  description = "Default AMI name refers to the Windows Server 2025 image provided by Microsoft."
 }
 
 variable "BUILD_SCRIPTS" {
@@ -51,6 +51,8 @@ variable "BUILD_SCRIPTS" {
     "Install-Dependencies.ps1",
     "Install-MATLABProxy.ps1",
     "Install-MATLAB.ps1",
+    "Setup-SupportPackageRoot.ps1",
+    "Install-MSH.ps1",
     "Remove-IE.ps1"
   ]
   description = "The list of installation scripts Packer will use when building the image."
@@ -78,15 +80,14 @@ variable "RUNTIME_SCRIPTS" {
   type = list(string)
   default = [
     "Install-NVIDIAGridDriver.ps1",
-    "Start-MATLABProxy.ps1",
-    "generate-certificate.py"
+    "Start-MATLABProxy.ps1"
   ]
   description = "The list of runtime scripts Packer will copy to the remote machine image builder, which can be used after the CloudFormation Stack creation."
 }
 
 variable "DCV_INSTALLER_URL" {
   type        = string
-  default     = "https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi"
+  default     = "https://d1uj6qtbmh3dt5.cloudfront.net/2024.0/Servers/nice-dcv-server-x64-Release-2024.0-19030.msi"
   description = "The URL to install NICE DCV, a remote display protocol to use."
 }
 
@@ -98,13 +99,16 @@ variable "NVIDIA_DRIVER_INSTALLER_URL" {
 
 variable "NVIDIA_GRID_DRIVER_VERSION" {
   type        = string
-  default     = "19.3"
+  # GRID 20.2 ships driver 596.86. R2026b requires an NVIDIA driver >= 590; the
+  # previous default (GRID 19.3 = driver 581.80) is too old and fails GPU tests.
+  # 20.2 is the newest GRID release with a Windows Server 2025 installer.
+  default     = "20.2"
   description = "The version of the NVIDIA GRID driver for use with G6, Gr6, G6e, G5, G4dn, and G3 instances."
 }
 
 variable "PYTHON_INSTALLER_URL" {
   type        = string
-  default     = "https://www.python.org/ftp/python/3.10.5/python-3.10.5-amd64.exe"
+  default     = "https://www.python.org/ftp/python/3.14.4/python-3.14.4-amd64.exe"
   description = "The URL to install python into the target machine image."
 }
 
@@ -165,6 +169,12 @@ variable "AMI_TAGS" {
   description = "The tags Packer adds to the resultant machine image."
 }
 
+variable "SHARE_AMI_WITH_ACCOUNTS" {
+  type        = list(string)
+  default     = []
+  description = "List of other AWS accounts that can deploy the resulting AMI. If empty, only the account that built the AMI can deploy it."
+}
+
 variable "MANIFEST_OUTPUT_FILE" {
   type        = string
   default     = "packer_manifest.json"
@@ -191,8 +201,12 @@ variable "AWS_INSTANCE_PROFILE" {
 
 variable "MATLAB_PROXY_VERSION" {
   type        = string
-  default     = "0.10.0"
-  description = "The matlab-proxy version to use."
+  default     = "latest"
+  description = "Version of matlab-proxy to install. Use 'latest' to install the newest version available on PyPI, or pin to a specific version (e.g. '0.10.0')."
+  validation {
+    condition     = length(var.MATLAB_PROXY_VERSION) > 0
+    error_message = "MATLAB_PROXY_VERSION must not be empty. Use a version string or 'latest'."
+  }
 }
 
 variable "MSA_URL" {
@@ -250,7 +264,10 @@ source "amazon-ebs" "AMI_Builder" {
   # Communicator setup
   ssh_username                 = "${var.PACKER_ADMIN_USERNAME}"
   ssh_interface                = "${var.SSH_INTERFACE}"
-  ssh_timeout                  = "10m" 
+  ssh_timeout                  = "20m"
+  # Win32-OpenSSH scp fails on the mark-of-the-web, so use the sftp subsystem.
+  # https://developer.hashicorp.com/packer/docs/communicators/ssh#ssh_file_transfer_method
+  ssh_file_transfer_method     = "sftp"
 
   # Optional bastion host configuration
   ssh_bastion_host             = "${var.SSH_BASTION_HOST}"
@@ -296,8 +313,10 @@ source "amazon-ebs" "AMI_Builder" {
     owners      = ["801119661308"] # Owner ID associated with Windows Server AMIs
     most_recent = true
   }
-  run_tags = "${var.INSTANCE_TAGS}"
-  tags     = "${var.AMI_TAGS}"
+  ami_users      = "${var.SHARE_AMI_WITH_ACCOUNTS}"
+  snapshot_users = "${var.SHARE_AMI_WITH_ACCOUNTS}"
+  run_tags       = "${var.INSTANCE_TAGS}"
+  tags           = "${var.AMI_TAGS}"
 
   # Inject SSH setup script as user-data
   user_data  = templatefile("build/config/packer/enable_openssh.pkrtpl.hcl", {})

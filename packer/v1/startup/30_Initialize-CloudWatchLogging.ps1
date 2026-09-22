@@ -16,7 +16,7 @@
     https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-cloudwatch-agent-configuration-file.html
 
 .NOTES
-    Copyright 2023-2024 The MathWorks, Inc.
+    Copyright 2023-2026 The MathWorks, Inc.
 #>
 
 function Initialize-CloudWatchLogging {
@@ -35,7 +35,8 @@ function Initialize-CloudWatchLogging {
     if ($WindowsVersion -eq 'Microsoft Windows Server 2019 Datacenter') {
         $UserDataExecutionLogPath = "$($Env:ProgramData.Replace('\','/'))/Amazon/EC2-Windows/Launch/Log/UserDataExecution.log"
     }
-    elseif ($WindowsVersion -eq 'Microsoft Windows Server 2022 Datacenter') {
+    elseif ($WindowsVersion -match 'Microsoft Windows Server (2022|2025)') {
+        # Windows Server 2022 and 2025 both use EC2Launch v2.
         $UserDataExecutionLogPath = "$($Env:ProgramData.Replace('\','/'))/Amazon/EC2Launch/log/agent.log"
     }
     else {

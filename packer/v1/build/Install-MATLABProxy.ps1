@@ -6,16 +6,16 @@
     Installs the matlab-proxy Python package.
 
 .PARAMETER Version
-    matlab-proxy version number. e.g. 0.10.0
+    matlab-proxy version number (e.g. "0.10.0"), or "latest" to install the most recent version available on PyPI.
 
 .EXAMPLE
-    Install-MATLABProxy -Version "0.10.0"
+    Install-MATLABProxy -Version "latest"
 
 .LINK
     https://github.com/mathworks/matlab-proxy
 
 .NOTES
-    Copyright 2024 The MathWorks, Inc.
+    Copyright 2024-2026 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -27,7 +27,14 @@ function Install-MATLABProxy {
     )
 
     Write-Output 'Starting Install-MATLABProxy...'
-    & $Env:ProgramFiles\Python310\python.exe -m pip install matlab-proxy==$Version
+    if ($Version -eq 'latest') {
+        & $Env:ProgramFiles\Python\python.exe -m pip install matlab-proxy
+    }
+    else {
+        & $Env:ProgramFiles\Python\python.exe -m pip install matlab-proxy==$Version
+    }
+    $InstalledVersion = & $Env:ProgramFiles\Python\python.exe -m pip show matlab-proxy | Select-String '^Version:' | ForEach-Object { ($_ -split '\s+')[1] }
+    Write-Output "Installed matlab-proxy version: $InstalledVersion"
 
     Write-Output 'Moving the SSL certificate generator and launcher script to the right directory...'
     $RuntimeSource = 'C:\Windows\Temp\runtime'
@@ -36,7 +43,6 @@ function Install-MATLABProxy {
     
     New-Item $DestinationFolder -Type Directory
     Copy-Item "$RuntimeSource\Start-MatlabProxy.ps1" -Destination "$DestinationFolder\Start-MatlabProxy.ps1"
-    Copy-Item "$RuntimeSource\generate-certificate.py" -Destination "$DestinationFolder\generate-certificate.py"
     
     Write-Output 'Done with Install-MATLABProxy.'   
 }

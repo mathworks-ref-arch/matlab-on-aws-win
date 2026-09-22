@@ -13,31 +13,6 @@
 .NOTES
     Copyright 2020-2026 The MathWorks, Inc.
 #>
-function Test-AWSEndpoint {
-    param(
-        [Parameter(Mandatory)]
-        [string]$Endpoint,
-        [int]$Port = 443,
-        [int]$TimeoutSeconds = 5
-    )
-
-    try {
-        $TcpClient = New-Object System.Net.Sockets.TcpClient
-        $Connection = $TcpClient.ConnectAsync($Endpoint, $Port)
-        $Completed = $Connection.Wait($TimeoutSeconds * 1000)
-        if ($Completed -and -not $Connection.IsFaulted) {
-            return $true
-        }
-        return $false
-    } catch {
-        Write-Host "Error connecting to $Endpoint : $($_.Exception.Message)"
-    } finally {
-        if ($TcpClient) { $TcpClient.Dispose() }
-    }
-    
-    return $false
-}
-
 function Set-DDUX {
 
     Write-Output 'Starting Set-DDUX...'
@@ -45,23 +20,15 @@ function Set-DDUX {
     [Environment]::SetEnvironmentVariable('MW_CONTEXT_TAGS', 'MATLAB:AWS:V1', [System.EnvironmentVariableTarget]::Machine)
     [Environment]::SetEnvironmentVariable('MW_DDUX_FORCE_ENABLE', $true, [System.EnvironmentVariableTarget]::Machine)
 
-    $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "120"} -Method PUT -Uri http://169.254.169.254/latest/api/token
-    $ResponseInstanceId = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
-    $ResponseRegion = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -Uri http://169.254.169.254/latest/meta-data/placement/region
-    $AWSDomain = "amazonaws.com"
-    if ($ResponseRegion -like "cn-*") { 
-        $AWSDomain = "amazonaws.com.cn" 
+    # Fetch the mw-app instance tag from IMDS (instance metadata tags must be enabled on the instance).
+    $Token = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds" = "300"} -Method PUT -Uri http://169.254.169.254/latest/api/token
+    $InstanceTags = Invoke-RestMethod -Headers @{"X-aws-ec2-metadata-token" = $Token} -Method GET -Uri http://169.254.169.254/latest/meta-data/tag-sets/instance
+
+    # A JSON response is auto-parsed into an object; fall back to parsing a raw string.
+    if ($InstanceTags -is [string]) {
+        $InstanceTags = $InstanceTags | ConvertFrom-Json
     }
-
-    $EC2Endpoint = "ec2.$ResponseRegion.$AWSDomain"
-
-    if (-not (Test-AWSEndpoint -Endpoint "$EC2Endpoint")) {
-        Write-Output "AWS EC2 Endpoint $EC2Endpoint is not reachable. Skipping DDUX tag check."
-        return
-    }
-
-    $MWAppTagGroup = aws ec2 describe-tags --filters "Name=resource-id,Values=$ResponseInstanceId" 'Name=key,Values=mw-app' --region "$ResponseRegion"
-    $MWAppTag = (Write-Output $MWAppTagGroup | ConvertFrom-Json).Tags.Value
+    $MWAppTag = $InstanceTags.'mw-app'
 
     if ( $MWAppTag -eq 'cloudcenter' ) {
         [Environment]::SetEnvironmentVariable('MW_CONTEXT_TAGS', 'MATLAB:AWS:V1,MATLAB:CLOUD_CENTER:V1', [System.EnvironmentVariableTarget]::Machine)

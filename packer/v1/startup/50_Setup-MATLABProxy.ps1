@@ -3,10 +3,9 @@
     Enables matlab-proxy to enable browser access to MATLAB.
 
 .DESCRIPTION
-    Creates self-signed certificates for secure communication via matlab-proxy. 
     Sets up matlab-proxy's authentication token to expect the user's VM password.
     Adds a firewall rule to allow matlab-proxy traffic.
-    Invokes a task that starts matlab-proxy in the background.
+    Starts matlab-proxy in the background.
 
 .PARAMETER EnableBrowserAccess
     (Required) Check to determine if the user has enabled browser access.
@@ -18,65 +17,82 @@
     Set-MATLABProxy -EnableBrowserAccess "Yes" -AuthToken "<AUTH-TOKEN>"
 
 .NOTES
-    Copyright 2024 The MathWorks, Inc.
+    Copyright 2024-2026 The MathWorks, Inc.
 #>
+
+$LAUNCH_FILE = "$Env:ProgramFiles\MathWorks\matlab-proxy\Start-MatlabProxy.ps1"
+$MATLAB_PROXY_PORT = "8123"
+
+# This refarch always runs matlab-proxy as the Administrator user, which is the
+# default set in the launch script. The function below is retained, but not called,
+# so that support for a configurable user can be enabled here in the future without
+# restructuring this script.
+# function Set-MATLABProxyUser {
+#     param(
+#         [Parameter(Mandatory = $true)]
+#         [string] $Username
+#     )
+#
+#     # Set the user that matlab-proxy runs MATLAB as
+#     (Get-Content $LAUNCH_FILE -Raw) -Replace '\$USER = "Administrator"', ('$USER = "' + $Username + '"') | Set-Content $LAUNCH_FILE
+# }
+
+function Set-MATLABProxyAuthToken {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $AuthToken
+    )
+
+    # Set up token-authentication for matlab-proxy
+    $PasswordDec = "[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('$AuthToken'))"
+    (Get-Content $LAUNCH_FILE -Raw) -Replace '# \$Env:MWI_AUTH_TOKEN=', ('$Env:MWI_AUTH_TOKEN=' + $PasswordDec) | Set-Content $LAUNCH_FILE
+}
+
+function Set-MATLABProxyFirewallRule {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Port
+    )
+
+    # Open a firewall rule for matlab-proxy (only required on Windows)
+    $RuleName = "matlab-proxy - Allow TCP"
+    if (-not (Get-NetFirewallRule -DisplayName $RuleName -ErrorAction SilentlyContinue)) {
+        New-NetFirewallRule -DisplayName $RuleName -Direction Inbound -Protocol TCP -LocalPort $Port -Action Allow
+    }
+}
+
+function Start-MATLABProxy {
+    # Launch the matlab-proxy startup script in the background
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$LAUNCH_FILE`"" -WindowStyle Hidden
+}
 
 function Set-MATLABProxy {
 
     param(
-        [Parameter(Mandatory = $true)]  
+        [Parameter(Mandatory = $true)]
         [string] $EnableBrowserAccess,
-        
+
+        [Parameter(Mandatory = $true)]
+        [string] $Port,
+
         [Parameter(Mandatory = $true)]
         [string] $AuthToken
     )
 
     Write-Output 'Starting Set-MATLABProxy...'
 
-    # Generate the SSL certificate for matlab-proxy to use TLS
-    $MatlabProxyDataPath = "$Env:ProgramData\MathWorks\matlab-proxy"
-    New-Item $MatlabProxyDataPath -Type Directory
-
-    $CertPath = "$MatlabProxyDataPath\certificate.pem"
-    $KeyPath = "$MatlabProxyDataPath\private_key.pem"
-
-    if ((-not (Test-Path $CertPath)) -or (-not (Test-Path $KeyPath))) {
-        if (Test-Path $CertPath) {
-            Remove-Item -Path $CertPath
-        }
-        if (Test-Path $KeyPath) {
-            Remove-Item -Path $KeyPath
-        }
-        py "$Env:ProgramFiles\MathWorks\matlab-proxy\generate-certificate.py"
-        Move-Item -Path "$Env:ProgramFiles\MathWorks\matlab-proxy\private_key.pem" -Destination $KeyPath
-        Move-Item -Path "$Env:ProgramFiles\MathWorks\matlab-proxy\certificate.pem" -Destination $CertPath
-    }
-
-    # Set up token-authentication for matlab-proxy
-    if ($AuthToken) {
-        $LaunchFile = "$Env:ProgramFiles\MathWorks\matlab-proxy\Start-MatlabProxy.ps1"
-        $PasswordDec = "[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('$AuthToken'))"
-
-        (Get-Content $LaunchFile -Raw) -Replace '# \$Env:MWI_AUTH_TOKEN=', ('$Env:MWI_AUTH_TOKEN=' + $PasswordDec) | Set-Content $LaunchFile
-    }
-
-    # Open a firewall rule for matlab-proxy (only required on Windows)
-    $RuleName = "matlab-proxy - Allow TCP"
-    if (-not (Get-NetFirewallRule -DisplayName $RuleName -ErrorAction SilentlyContinue)) {
-        New-NetFirewallRule -DisplayName $RuleName -Direction Inbound -Protocol TCP -LocalPort 8123 -Action Allow
-    }
-
-    # Start matlab-proxy
     if ($EnableBrowserAccess -eq "Yes") {
-        Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"C:\Program Files\MathWorks\matlab-proxy\Start-MATLABProxy.ps1`"" -WindowStyle Hidden
+        # Set-MATLABProxyUser -Username $Env:Username
+        Set-MATLABProxyAuthToken -AuthToken $AuthToken
+        Set-MATLABProxyFirewallRule -Port $Port
+        Start-MATLABProxy
     }
 
     Write-Output 'Done with Set-MATLABProxy.'
-    
 }
 
 try {
-    Set-MATLABProxy -EnableBrowserAccess $Env:EnableMATLABProxy -AuthToken $Env:Password
+    Set-MATLABProxy -EnableBrowserAccess $Env:EnableMATLABProxy -Port $MATLAB_PROXY_PORT -AuthToken $Env:Password
 }
 catch {
     $ScriptPath = $MyInvocation.MyCommand.Path

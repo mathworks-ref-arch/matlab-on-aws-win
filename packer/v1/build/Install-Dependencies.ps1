@@ -12,7 +12,7 @@
     The URL for the NICE DCV installer.
 
 .NOTES
-    Copyright 2023-2025 The MathWorks, Inc.
+    Copyright 2023-2026 The MathWorks, Inc.
     The function sets $ErrorActionPreference to 'Stop' to ensure that any errors encountered during the installation process will cause the script to stop and throw an error.
 #>
 
@@ -297,7 +297,10 @@ function Install-Python {
     Invoke-WebRequest -Uri $PythonInstallerUrl -OutFile 'C:\Windows\Temp\python.exe'
 
     Write-Output 'Python Installer downloaded successfully. Installing ...'
-    Start-Process 'C:\Windows\Temp\python.exe' -Wait -ArgumentList '/quiet InstallAllUsers=1'
+    # Install to a fixed, version-independent location so downstream scripts do not
+    # need to know the Python version. Without TargetDir the installer defaults to
+    # C:\Program Files\Python<major><minor> (e.g. Python310, Python314).
+    Start-Process 'C:\Windows\Temp\python.exe' -Wait -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 TargetDir="C:\Program Files\Python"'
 
     Write-Output 'Done with Install-Python.'
 }

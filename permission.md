@@ -664,11 +664,6 @@ Since your users cannot create IAM roles within their CloudFormation stacks, you
             "Effect": "Allow"
         },
         {
-            "Action": "ec2:DescribeTags",
-            "Resource": "*",
-            "Effect": "Allow"
-        },
-        {
             "Action": [
                 "ssm:DescribeAssociation",
                 "ssm:DescribeDocument",

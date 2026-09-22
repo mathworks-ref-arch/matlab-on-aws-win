@@ -132,7 +132,7 @@ function Initialize-MATLAB {
     Write-Output 'Generate Toolbox cache xml if MATLAB version is greater than or equal to 2021b'
     # Toolbox cache generation is supported from R2021b onwards.
     if ($Release -ge 'R2021b') {
-        & 'C:\Program Files\Python310\python.exe' C:\Windows\Temp\config\matlab\generate_toolbox_cache.py "C:\Program Files\MATLAB\$Release" "C:\Program Files\MATLAB\$Release\toolbox\local"
+        & 'C:\Program Files\Python\python.exe' C:\Windows\Temp\config\matlab\generate_toolbox_cache.py "C:\Program Files\MATLAB\$Release" "C:\Program Files\MATLAB\$Release\toolbox\local"
     }
     else {
         Write-Host "Unable to generate Toolbox cache xml as version $Release is less than R2021b."
